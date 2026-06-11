@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keyscape Homes - Premium Shortlets in Lagos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+  <div class="nav-container">
+    <div class="logo">
+      <img src="logo/keyscape-logo.png" alt="KeyScape Logo" height="40">
+    </div>
+    
+    <!-- Desktop Links -->
+    <div class="nav-links">
+      <a href="#">Browse Homes</a>
+      <a href="#">List Your Property</a>
+      <a href="#">How it Works</a>
+    </div>
+
+    <!-- Hamburger -->
+    <button class="hamburger" id="hamburgerBtn">☰</button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#">Browse Homes</a>
+    <a href="#">List Your Property</a>
+    <a href="#">How it Works</a>
+  </div>
+</nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Stay Different.<br>Stay Premium.</h1>
+      <p>Discover luxury shortlet homes across Lagos</p>
+      
+      <div class="search-bar">
+        <input type="text" placeholder="Where are you going?">
+        <button>Search Homes</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Properties -->
+  <section class="featured">
+    <h2>Featured Homes</h2>
+    <div class="property-grid">
+      <!-- AOI Crib - Fully Clickable -->
+      <a href="aoicrib/index.html" class="property-card">
+        <img src="images/aoi-crib.jpg" alt="AOI Crib">
+        <div class="card-content">
+          <h3>AOI Crib Apartment</h3>
+          <p class="location">Thore Signature Building, Gbangbala Street, Ikate, Lekki, Lagos</p>
+          <p class="price">₦45,000 <span>per night</span></p>
+          <span class="view-details">View Details →</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Keyscape Homes. All rights reserved.</p>
+  </footer>
+  <script>
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+
+  hamburgerBtn.addEventListener('click', () => {
+    mobileMenu.classList.toggle('active');
+  });
+</script>
+</body>
+</html>

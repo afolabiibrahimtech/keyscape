@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AOI Crib Apartment | Keyscape Homes</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  
+  <a href="../index.html" class="back-btn">← Back to Homes</a>
+
+  <div class="property-detail">
+    <div class="property-header">
+      <h1>AOI Crib Apartment</h1>
+      <p class="location">Thore Signature Building, Gbangbala Street, Ikate, Lekki, Lagos</p>
+      <div class="rating">
+        ★★★★☆ <strong>4.8</strong> (42 reviews)
+      </div>
+    </div>
+
+    <div class="gallery">
+      <div class="main-image">
+        <img src="images/aoi-crib.jpg" alt="AOI Crib Apartment">
+      </div>
+    </div>
+
+    <div class="property-info">
+      <div class="price-box">
+        <h2>₦45,000 <span>per night</span></h2>
+        <p>Minimum stay: 2 nights • Up to 10 guests</p>
+        <button id="openBooking" class="btn btn-primary">Check Availability & Book Now</button>
+      </div>
+
+      <!-- Amenities Preview -->
+      <div class="amenities">
+        <h3>What this place offers</h3>
+        <ul class="features-preview">
+          <li>Swimming Pool</li>
+          <li>Well Equipped Gym</li>
+          <li>PS5 Gaming Console</li>
+          <li>24/7 Power Supply</li>
+          <li>Very Fast Internet</li>
+        </ul>
+        <button id="showAllAmenities" class="btn btn-outline">Show all amenities</button>
+      </div>
+    </div>
+
+    <!-- About the Host -->
+    <div class="host-section">
+      <h2>Meet Your Host</h2>
+      <div class="host-card green-card">
+        <img src="../images/host.jpg" alt="Afolabi Ibrahim" class="host-image">
+        <div class="host-info">
+          <h3>Afolabi Ibrahim O.</h3>
+          <p class="host-title">General Manager, Keyscape Homes</p>
+          <div class="host-stats">
+            <div class="stat">⭐ <strong>4.9</strong></div>
+            <div class="stat"><strong>87</strong> reviews</div>
+            <div class="stat">Hosting since <strong>2020</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="host-extra">
+        <p><strong>Languages:</strong> English, Yoruba</p>
+        <p class="host-bio">Passionate about delivering exceptional shortlet experiences. I personally manage all properties to ensure every guest has a memorable and comfortable stay.</p>
+      </div>
+    </div>
+
+    <!-- House Rules -->
+    <div class="house-rules">
+      <h2>House Rules</h2>
+      <ul>
+        <li>No smoking inside the property</li>
+        <li>No parties or events</li>
+        <li>Check-in after 2:00 PM</li>
+        <li>Check-out before 12:00 PM</li>
+        <li>Pets not allowed</li>
+        <li>Respect quiet hours (10 PM - 8 AM)</li>
+      </ul>
+    </div>
+
+       <!-- Location -->
+    <div class="location-section">
+      <h2>Location</h2>
+      <p>Thore Signature Building, Gbangbala Street, Ikate, Lekki, Lagos</p>
+      <div class="map">
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.0!2d3.399!3d6.469!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b2b2b2b2b2b%3A0x0!2sIkate%2C%20Lekki%2C%20Lagos!5e0!3m2!1sen!2sng!4v1720000000000" 
+          width="100%" 
+          height="450" 
+          style="border:0; border-radius: 16px;" 
+          allowfullscreen="" 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Modal -->
+  <div id="bookingModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeBooking">&times;</span>
+      <h2>Select Your Dates</h2>
+      <div class="date-picker">
+        <div>
+          <label>Check-in Date</label>
+          <input type="date" id="checkIn">
+        </div>
+        <div>
+          <label>Check-out Date</label>
+          <input type="date" id="checkOut">
+        </div>
+      </div>
+      <div class="price-summary">
+        <p>Nights: <strong id="nights">0</strong></p>
+        <p>Total: <strong id="totalPrice">₦0</strong></p>
+      </div>
+      <button id="confirmBooking" class="btn btn-primary">Confirm Booking</button>
+    </div>
+  </div>
+
+  <!-- All Amenities Modal -->
+  <div id="amenitiesModal" class="modal">
+    <div class="modal-content white-modal">
+      <div class="modal-header">
+        <button id="modalBackBtn" class="back-arrow">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </button>
+        <h2>What this place offers</h2>
+      </div>
+      
+      <div class="amenities-categories">
+        <div class="category">
+          <h4>Bathroom</h4>
+          <ul>
+            <li><img src="../icons/hairdryer.svg" width="24" height="24"> Hairdryer</li>
+            <li><img src="../icons/shampoo.svg" width="24" height="24"> Shampoo</li>
+            <li><img src="../icons/conditioner.svg" width="24" height="24"> Conditioner</li>
+            <li><img src="../icons/body-soap.svg" width="24" height="24"> Body soap</li>
+            <li><img src="../icons/hot-water.svg" width="24" height="24"> Hot water</li>
+          </ul>
+        </div>
+
+        <div class="category">
+          <h4>Bedroom and laundry</h4>
+          <ul>
+            <li><img src="../icons/washing-machine.svg" width="24" height="24"> Washing machine</li>
+            <li><img src="../icons/dryer.svg" width="24" height="24"> Dryer – In building</li>
+            <li><img src="../icons/hangers.svg" width="24" height="24"> Hangers</li>
+            <li><img src="../icons/bed-linen.svg" width="24" height="24"> Bed linen</li>
+            <li><img src="../icons/iron.svg" width="24" height="24"> Iron</li>
+          </ul>
+        </div>
+
+        <div class="category">
+          <h4>Entertainment</h4>
+          <ul>
+            <li><img src="../icons/tv.svg" width="24" height="24"> TV</li>
+            <li><img src="../icons/ps5-gaming-console.svg" width="24" height="24"> PS5 Gaming Console</li>
+            <li><img src="../icons/streaming-services.svg" width="24" height="24"> Netflix, YouTube & Prime</li>
+          </ul>
+        </div>
+
+        <div class="category">
+          <h4>Heating and cooling</h4>
+          <ul>
+            <li><img src="../icons/air-conditioning.svg" width="24" height="24"> Central air conditioning</li>
+            <li><img src="../icons/fan.svg" width="24" height="24"> Fans</li>
+          </ul>
+        </div>
+
+        <div class="category">
+          <h4>Privacy and safety</h4>
+          <ul>
+            <li><img src="../icons/lock-bedroom-door.svg" width="24" height="24"> Lock on bedroom door</li>
+            <li><img src="../icons/security-camera.svg" width="24" height="24"> Exterior security cameras</li>
+            <li><img src="../icons/smoke-alarm.svg" width="24" height="24"> Smoke alarm</li>
+            <li><img src="../icons/fire-extinguisher.svg" width="24" height="24"> Fire extinguisher</li>
+          </ul>
+        </div>
+
+        <div class="category">
+          <h4>Internet and office</h4>
+          <ul>
+            <li><img src="../icons/wifi.svg" width="24" height="24"> Wifi</li>
+            <li><img src="../icons/workspace.svg" width="24" height="24"> Dedicated workspace</li>
+          </ul>
+        </div>
+
+        <div class="category">
+          <h4>Kitchen and dining</h4>
+          <ul>
+            <li><img src="../icons/kitchen.svg" width="24" height="24"> Kitchen</li>
+            <li><img src="../icons/fridge.svg" width="24" height="24"> Fridge</li>
+            <li><img src="../icons/microwave.svg" width="24" height="24"> Microwave</li>
+            <li><img src="../icons/cooking-basics.svg" width="24" height="24"> Cooking basics</li>
+            <li><img src="../icons/crockery-cutlery.svg" width="24" height="24"> Crockery and cutlery</li>
+          </ul>
+        </div>
+
+        <div class="category">
+          <h4>Outdoor</h4>
+          <ul>
+            <li><img src="../icons/private-balconies.svg" width="24" height="24"> Two Private Balconies</li>
+            <li><img src="../icons/swimming-pool.svg" width="24" height="24"> Swimming Pool</li>
+          </ul>
+        </div>
+
+        <div class="category">
+          <h4>Parking and facilities</h4>
+          <ul>
+            <li><img src="../icons/free-parking.svg" width="24" height="24"> Free parking on premises</li>
+            <li><img src="../icons/elevator.svg" width="24" height="24"> Elevator</li>
+            <li><img src="../icons/gym.svg" width="24" height="24"> Gym</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 Keyscape Homes</p>
+  </footer>
+
+  <script>
+    // Booking Modal
+    const bookingModal = document.getElementById('bookingModal');
+    const openBookingBtn = document.getElementById('openBooking');
+    const closeBookingBtn = document.getElementById('closeBooking');
+
+    openBookingBtn.onclick = () => bookingModal.style.display = "flex";
+    closeBookingBtn.onclick = () => bookingModal.style.display = "none";
+
+    // Amenities Modal
+    const amenitiesModal = document.getElementById('amenitiesModal');
+    const showAllBtn = document.getElementById('showAllAmenities');
+    const modalBackBtn = document.getElementById('modalBackBtn');
+
+    showAllBtn.onclick = () => amenitiesModal.style.display = "flex";
+    modalBackBtn.onclick = () => amenitiesModal.style.display = "none";
+
+    // Close modals when clicking outside
+    window.onclick = (e) => {
+      if (e.target === bookingModal) bookingModal.style.display = "none";
+      if (e.target === amenitiesModal) amenitiesModal.style.display = "none";
+    };
+  </script>
+</body>
+</html>

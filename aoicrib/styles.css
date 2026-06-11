@@ -1,0 +1,407 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #0f4c3a;
+  --accent: #1a8c6b;
+  --light: #f8fafc;
+  --dark: #111827;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--light);
+  color: var(--dark);
+  line-height: 1.7;
+}
+
+.back-btn {
+  display: inline-block;
+  margin: 20px 5%;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Property Detail */
+.property-detail {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 5%;
+}
+
+.property-header h1 {
+  font-size: 2.8rem;
+  margin-bottom: 8px;
+}
+
+.location {
+  color: #666;
+  font-size: 1.2rem;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin: 30px 0;
+}
+
+/* Info Grid */
+.property-info {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 3rem;
+  margin: 40px 0;
+}
+
+.price-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.price-box h2 {
+  color: var(--primary);
+  font-size: 2.2rem;
+}
+
+.amenities {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  list-style: none;
+}
+
+.features-grid li {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+/* Booking Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: #1e2937;
+  color: white;
+  padding: 30px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 480px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-size: 30px;
+  cursor: pointer;
+  color: #94a3b8;
+}
+
+.close:hover {
+  color: white;
+}
+
+.date-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.date-picker label {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.date-input {
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  background: #334155;
+  color: white;
+  width: 100%;
+}
+
+.price-summary {
+  background: #334155;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.btn {
+  display: inline-block;
+  padding: 16px 32px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 1rem;
+  transition: all 0.3s;
+  width: 100%;
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+}
+
+.description {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  margin-bottom: 60px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .property-info {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .hero-image img {
+    height: 350px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-image img {
+    height: 280px;
+  }
+}
+.amenities-header {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.features-grid.hidden {
+  display: none;
+}
+
+.toggle-icon {
+  font-size: 1.2rem;
+  transition: transform 0.3s;
+}
+.features-grid li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: #f8fafc;
+  border-radius: 12px;
+  font-size: 1.05rem;
+}
+
+.features-grid svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+/* Host Card */
+.host-section {
+  margin: 50px 0;
+}
+
+.green-card {
+  background: #0f4c3a;
+  color: white;
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(15, 76, 58, 0.3);
+}
+
+.host-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(255,255,255,0.2);
+}
+
+.host-info h3 {
+  margin-bottom: 8px;
+  font-size: 1.6rem;
+}
+
+.host-title {
+  opacity: 0.9;
+  margin-bottom: 1rem;
+}
+
+.host-stats {
+  display: flex;
+  gap: 2rem;
+  margin: 1rem 0;
+}
+
+.stat {
+  font-size: 1.1rem;
+}
+
+.host-bio {
+  opacity: 0.95;
+  line-height: 1.6;
+}
+/* Amenities Modal - Airbnb Style */
+.modal-content.wide {
+  max-width: 700px;
+  width: 95%;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content.scrollable {
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+
+.amenities-categories {
+  padding: 0 24px 40px;
+  overflow-y: auto;
+  max-height: calc(85vh - 80px);
+  scrollbar-width: thin;
+}
+
+.category {
+  margin-bottom: 32px;
+}
+
+.category h4 {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: #222;
+}
+
+.category ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category li {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1rem;
+}
+
+.category li:last-child {
+  border-bottom: none;
+}
+
+.category .icon {
+  font-size: 1.3rem;
+  width: 28px;
+}
+
+/* Preview section */
+.features-preview {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+
+.features-preview li {
+  padding: 8px 0;
+  font-size: 1.05rem;
+}
+.white-modal {
+  background-color: white;
+  color: #222;
+  max-width: 700px;
+  width: 95%;
+  max-height: 90vh;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+
+.back-arrow {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+}
+
+.amenities-categories {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+.map {
+  margin-top: 15px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.map iframe {
+  border-radius: 16px;
+}
