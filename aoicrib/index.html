@@ -19,13 +19,15 @@
       </div>
     </div>
 
-       <!-- Gallery -->
+    <!-- Swipeable Gallery -->
     <div class="gallery">
-      <div class="main-image">
+      <div class="main-image" id="mainImageContainer">
         <img id="mainImage" src="images/aoi-crib.jpg" alt="AOI Crib Apartment">
         <div class="image-counter" id="imageCounter">1 / 4</div>
       </div>
-      <div class="thumbnails">
+
+      <!-- Thumbnails -->
+      <div class="thumbnails" id="thumbnails">
         <img src="images/aoi-crib.jpg" class="thumb active" alt="Photo 1">
         <img src="images/aoi-crib-2.jpg" class="thumb" alt="Photo 2">
         <img src="images/aoi-crib-3.jpg" class="thumb" alt="Photo 3">
@@ -240,6 +242,56 @@
   </footer>
 
   <script>
+    // Swipeable Gallery
+    const galleryImages = [
+      "images/aoi-crib.jpg",
+      "images/aoi-crib-2.jpg",
+      "images/aoi-crib-3.jpg",
+      "images/aoi-crib-4.jpg"
+    ];
+
+    let currentIndex = 0;
+    const mainImage = document.getElementById('mainImage');
+    const imageCounter = document.getElementById('imageCounter');
+    const thumbs = document.querySelectorAll('.thumb');
+
+    function showImage(index) {
+      mainImage.src = galleryImages[index];
+      imageCounter.textContent = `${index + 1} / ${galleryImages.length}`;
+      
+      thumbs.forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === index);
+      });
+    }
+
+    // Thumbnail click
+    thumbs.forEach((thumb, index) => {
+      thumb.addEventListener('click', () => {
+        currentIndex = index;
+        showImage(currentIndex);
+      });
+    });
+
+    // Swipe Support
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const mainImageContainer = document.getElementById('mainImageContainer');
+
+    mainImageContainer.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    mainImageContainer.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (touchEndX < touchStartX - 50) {
+        currentIndex = (currentIndex + 1) % galleryImages.length;
+        showImage(currentIndex);
+      } else if (touchEndX > touchStartX + 50) {
+        currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+        showImage(currentIndex);
+      }
+    });
+
     // Calendar Logic
     let currentMonth = 5; 
     let currentYear = 2026;
@@ -314,13 +366,9 @@
 
         day.classList.remove('check-in', 'check-out', 'in-range');
 
-        if (date === checkInDate) {
-          day.classList.add('check-in');
-        } else if (date === checkOutDate) {
-          day.classList.add('check-out');
-        } else if (end && current > start && current < end) {
-          day.classList.add('in-range');
-        }
+        if (date === checkInDate) day.classList.add('check-in');
+        else if (date === checkOutDate) day.classList.add('check-out');
+        else if (end && current > start && current < end) day.classList.add('in-range');
       });
     }
 
@@ -362,6 +410,9 @@
       if (e.target.id === 'bookingModal') document.getElementById('bookingModal').style.display = "none";
       if (e.target.id === 'amenitiesModal') document.getElementById('amenitiesModal').style.display = "none";
     };
+
+    // Initial Gallery Load
+    showImage(0);
   </script>
 </body>
 </html>
