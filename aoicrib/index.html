@@ -7,8 +7,14 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  
-  <a href="../index.html" class="back-btn">← Back to Homes</a>
+
+  <!-- ✅ BUG 5 FIXED — back button inside a proper sticky nav -->
+  <nav class="detail-nav">
+    <div class="nav-container">
+      <a href="../index.html" class="back-btn">← Back to Homes</a>
+      <div class="logo" style="font-weight:700; font-size:1.4rem; color:#0f4c3a;">Keyscape</div>
+    </div>
+  </nav>
 
   <div class="property-detail">
     <div class="property-header">
@@ -19,15 +25,12 @@
       </div>
     </div>
 
-          <!-- Gallery -->
+    <!-- Gallery -->
     <div class="gallery">
       <div class="main-image">
-        <img id="mainImage" 
-             src="images/aoi-crib.jpg" 
-             alt="AOI Crib Apartment">
+        <img id="mainImage" src="images/aoi-crib.jpg" alt="AOI Crib Apartment">
         <div class="image-counter" id="imageCounter">1 / 4</div>
       </div>
-
       <div class="thumbnails">
         <img src="images/aoi-crib.jpg" class="thumb active" alt="Photo 1">
         <img src="images/aoi-crib-2.jpg" class="thumb" alt="Photo 2">
@@ -37,12 +40,6 @@
     </div>
 
     <div class="property-info">
-      <div class="price-box">
-        <h2>₦45,000 <span>per night</span></h2>
-        <p>Minimum stay: 2 nights • Up to 10 guests</p>
-        <button id="openBooking" class="btn btn-primary">Check Availability & Book Now</button>
-      </div>
-
       <div class="amenities">
         <h3>What this place offers</h3>
         <ul class="features-preview">
@@ -53,6 +50,13 @@
           <li>Very Fast Internet</li>
         </ul>
         <button id="showAllAmenities" class="btn btn-outline">Show all amenities</button>
+      </div>
+
+      <!-- ✅ BUG 4 FIXED — price box on right, sticky -->
+      <div class="price-box">
+        <h2>₦45,000 <span>per night</span></h2>
+        <p>Minimum stay: 2 nights • Up to 10 guests</p>
+        <button id="openBooking" class="btn btn-primary">Check Availability & Book Now</button>
       </div>
     </div>
 
@@ -95,7 +99,7 @@
       <h2>Location</h2>
       <p>Thore Signature Building, Gbangbala Street, Ikate, Lekki, Lagos</p>
       <div class="map">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.0!2d3.399!3d6.469!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b2b2b2b2b2b%3A0x0!2sIkate%2C%20Lekki%2C%20Lagos!5e0!3m2!1sen!2sng!4v1720000000000" 
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.0!2d3.399!3d6.469!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b2b2b2b2b2b%3A0x0!2sIkate%2C%20Lekki%2C%20Lagos!5e0!3m2!1sen!2sng!4v1720000000000"
           width="100%" height="450" style="border:0; border-radius: 16px;" allowfullscreen="" loading="lazy"></iframe>
       </div>
     </div>
@@ -106,7 +110,6 @@
     <div class="modal-content booking-modal">
       <span class="close" id="closeBooking">&times;</span>
       <h2>Select Your Dates</h2>
-      
       <div class="calendar-container">
         <div class="calendar-header">
           <button id="prevMonth">←</button>
@@ -115,13 +118,11 @@
         </div>
         <div class="calendar-grid" id="calendarGrid"></div>
       </div>
-
       <div class="selection-summary">
         <p><strong>Check-in:</strong> <span id="selectedCheckIn">Not selected</span></p>
         <p><strong>Check-out:</strong> <span id="selectedCheckOut">Not selected</span></p>
         <p><strong>Total:</strong> <span id="totalPrice">₦0</span> (<span id="nightsCount">0 nights</span>)</p>
       </div>
-
       <button id="confirmBooking" class="btn btn-primary">Confirm Booking</button>
     </div>
   </div>
@@ -148,7 +149,6 @@
         </button>
         <h2>What this place offers</h2>
       </div>
-      
       <div class="amenities-categories">
         <div class="category">
           <h4>Bathroom</h4>
@@ -160,7 +160,6 @@
             <li><img src="../icons/hot-water.svg" width="24" height="24"> Hot water</li>
           </ul>
         </div>
-
         <div class="category">
           <h4>Bedroom and laundry</h4>
           <ul>
@@ -171,7 +170,6 @@
             <li><img src="../icons/iron.svg" width="24" height="24"> Iron</li>
           </ul>
         </div>
-
         <div class="category">
           <h4>Entertainment</h4>
           <ul>
@@ -180,7 +178,6 @@
             <li><img src="../icons/streaming-services.svg" width="24" height="24"> Netflix, YouTube & Prime</li>
           </ul>
         </div>
-
         <div class="category">
           <h4>Heating and cooling</h4>
           <ul>
@@ -188,7 +185,6 @@
             <li><img src="../icons/fan.svg" width="24" height="24"> Fans</li>
           </ul>
         </div>
-
         <div class="category">
           <h4>Privacy and safety</h4>
           <ul>
@@ -198,7 +194,6 @@
             <li><img src="../icons/fire-extinguisher.svg" width="24" height="24"> Fire extinguisher</li>
           </ul>
         </div>
-
         <div class="category">
           <h4>Internet and office</h4>
           <ul>
@@ -206,7 +201,6 @@
             <li><img src="../icons/workspace.svg" width="24" height="24"> Dedicated workspace</li>
           </ul>
         </div>
-
         <div class="category">
           <h4>Kitchen and dining</h4>
           <ul>
@@ -217,7 +211,6 @@
             <li><img src="../icons/crockery-cutlery.svg" width="24" height="24"> Crockery and cutlery</li>
           </ul>
         </div>
-
         <div class="category">
           <h4>Outdoor</h4>
           <ul>
@@ -225,7 +218,6 @@
             <li><img src="../icons/swimming-pool.svg" width="24" height="24"> Swimming Pool</li>
           </ul>
         </div>
-
         <div class="category">
           <h4>Parking and facilities</h4>
           <ul>
@@ -259,13 +251,11 @@
     function showImage(index) {
       mainImage.src = galleryImages[index];
       imageCounter.textContent = `${index + 1} / ${galleryImages.length}`;
-      
       thumbs.forEach((thumb, i) => {
         thumb.classList.toggle('active', i === index);
       });
     }
 
-    // Thumbnail click
     thumbs.forEach((thumb, index) => {
       thumb.addEventListener('click', () => {
         currentIndex = index;
@@ -273,16 +263,16 @@
       });
     });
 
-    // Swipe Support
+    // ✅ BUG 1 FIXED — correct element ID for swipe
     let touchStartX = 0;
     let touchEndX = 0;
-    const mainImageContainer = document.getElementById('mainImageContainer');
+    const mainImageEl = document.getElementById('mainImage');
 
-    mainImageContainer.addEventListener('touchstart', e => {
+    mainImageEl.addEventListener('touchstart', e => {
       touchStartX = e.changedTouches[0].screenX;
     });
 
-    mainImageContainer.addEventListener('touchend', e => {
+    mainImageEl.addEventListener('touchend', e => {
       touchEndX = e.changedTouches[0].screenX;
       if (touchEndX < touchStartX - 50) {
         currentIndex = (currentIndex + 1) % galleryImages.length;
@@ -294,8 +284,8 @@
     });
 
     // Calendar Logic
-    let currentMonth = 5; 
-    let currentYear = 2026;
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
     let checkInDate = null;
     let checkOutDate = null;
     const nightlyRate = 45000;
@@ -307,8 +297,7 @@
       const firstDay = new Date(currentYear, currentMonth, 1).getDay();
       const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      days.forEach(day => {
+      ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(day => {
         const div = document.createElement('div');
         div.className = 'calendar-day header';
         div.textContent = day;
@@ -321,13 +310,24 @@
         grid.appendChild(empty);
       }
 
+      // ✅ BUG 3 FIXED — past dates blocked
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
         const dayEl = document.createElement('div');
-        dayEl.className = 'calendar-day';
         dayEl.textContent = day;
         dayEl.dataset.date = dateStr;
-        dayEl.addEventListener('click', () => handleDateClick(dateStr));
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const thisDate = new Date(dateStr);
+
+        if (thisDate < today) {
+          dayEl.className = 'calendar-day past';
+        } else {
+          dayEl.className = 'calendar-day';
+          dayEl.addEventListener('click', () => handleDateClick(dateStr));
+        }
+
         grid.appendChild(dayEl);
       }
 
@@ -354,19 +354,50 @@
       generateCalendar();
     }
 
+    // ✅ BUG 2 FIXED — confirmBooking outside handleDateClick, fires once only
+    document.getElementById('confirmBooking').addEventListener('click', () => {
+      if (!checkInDate || !checkOutDate) {
+        alert('Please select both check-in and check-out dates.');
+        return;
+      }
+
+      const start = new Date(checkInDate);
+      const end = new Date(checkOutDate);
+      const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+      if (nights < 2) {
+        alert('Minimum stay is 2 nights.');
+        return;
+      }
+
+      const checkIn = start.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      const checkOut = end.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      const total = (nights * nightlyRate).toLocaleString();
+
+      const message =
+        `Hello Keyscape Homes 👋\n\n` +
+        `I'd like to book the *AOI Crib Apartment*.\n\n` +
+        `📅 Check-in: ${checkIn}\n` +
+        `📅 Check-out: ${checkOut}\n` +
+        `🌙 Nights: ${nights}\n` +
+        `💰 Total: ₦${total}\n\n` +
+        `Please confirm availability.`;
+
+      const phone = '2348107923787';
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+    });
+
     function highlightRange() {
       if (!checkInDate) return;
-      const days = document.querySelectorAll('.calendar-day:not(.header):not(.empty)');
+      const days = document.querySelectorAll('.calendar-day:not(.header):not(.empty):not(.past)');
       days.forEach(day => {
         const date = day.dataset.date;
         if (!date) return;
-
         const current = new Date(date);
         const start = new Date(checkInDate);
         const end = checkOutDate ? new Date(checkOutDate) : null;
-
         day.classList.remove('check-in', 'check-out', 'in-range');
-
         if (date === checkInDate) day.classList.add('check-in');
         else if (date === checkOutDate) day.classList.add('check-out');
         else if (end && current > start && current < end) day.classList.add('in-range');
@@ -385,7 +416,6 @@
       }
     }
 
-    // Navigation
     document.getElementById('prevMonth').addEventListener('click', () => {
       currentMonth--;
       if (currentMonth < 0) { currentMonth = 11; currentYear--; }
@@ -412,7 +442,6 @@
       if (e.target.id === 'amenitiesModal') document.getElementById('amenitiesModal').style.display = "none";
     };
 
-    // Initial Gallery Load
     showImage(0);
   </script>
 </body>
