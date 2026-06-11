@@ -8,7 +8,6 @@
 </head>
 <body>
 
-  <!-- ✅ BUG 5 FIXED — back button inside a proper sticky nav -->
   <nav class="detail-nav">
     <div class="nav-container">
       <a href="../index.html" class="back-btn">← Back to Homes</a>
@@ -52,7 +51,6 @@
         <button id="showAllAmenities" class="btn btn-outline">Show all amenities</button>
       </div>
 
-      <!-- ✅ BUG 4 FIXED — price box on right, sticky -->
       <div class="price-box">
         <h2>₦45,000 <span>per night</span></h2>
         <p>Minimum stay: 2 nights • Up to 10 guests</p>
@@ -263,7 +261,7 @@
       });
     });
 
-    // ✅ BUG 1 FIXED — correct element ID for swipe
+    // Swipe Support
     let touchStartX = 0;
     let touchEndX = 0;
     const mainImageEl = document.getElementById('mainImage');
@@ -290,6 +288,18 @@
     let checkOutDate = null;
     const nightlyRate = 45000;
 
+    // ✅ Booked ranges — grows as guests confirm bookings
+    const bookedRanges = [];
+
+    function isDateBooked(dateStr) {
+      const d = new Date(dateStr);
+      return bookedRanges.some(range => {
+        const s = new Date(range.start);
+        const e = new Date(range.end);
+        return d >= s && d <= e;
+      });
+    }
+
     function generateCalendar() {
       const grid = document.getElementById('calendarGrid');
       grid.innerHTML = '';
@@ -310,7 +320,6 @@
         grid.appendChild(empty);
       }
 
-      // ✅ BUG 3 FIXED — past dates blocked
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
         const dayEl = document.createElement('div');
@@ -323,6 +332,9 @@
 
         if (thisDate < today) {
           dayEl.className = 'calendar-day past';
+        } else if (isDateBooked(dateStr)) {
+          // ✅ Booked dates — faded, strikethrough, unclickable
+          dayEl.className = 'calendar-day booked';
         } else {
           dayEl.className = 'calendar-day';
           dayEl.addEventListener('click', () => handleDateClick(dateStr));
@@ -354,7 +366,6 @@
       generateCalendar();
     }
 
-    // ✅ BUG 2 FIXED — confirmBooking outside handleDateClick, fires once only
     document.getElementById('confirmBooking').addEventListener('click', () => {
       if (!checkInDate || !checkOutDate) {
         alert('Please select both check-in and check-out dates.');
@@ -383,6 +394,20 @@
         `💰 Total: ₦${total}\n\n` +
         `Please confirm availability.`;
 
+      // ✅ Save booked range so dates fade out immediately
+      bookedRanges.push({ start: checkInDate, end: checkOutDate });
+
+      // Reset selections
+      checkInDate = null;
+      checkOutDate = null;
+      document.getElementById('selectedCheckIn').textContent = "Not selected";
+      document.getElementById('selectedCheckOut').textContent = "Not selected";
+      document.getElementById('totalPrice').textContent = "₦0";
+      document.getElementById('nightsCount').textContent = "0 nights";
+
+      // Refresh calendar to show booked dates
+      generateCalendar();
+
       const phone = '2348107923787';
       const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
@@ -390,7 +415,7 @@
 
     function highlightRange() {
       if (!checkInDate) return;
-      const days = document.querySelectorAll('.calendar-day:not(.header):not(.empty):not(.past)');
+      const days = document.querySelectorAll('.calendar-day:not(.header):not(.empty):not(.past):not(.booked)');
       days.forEach(day => {
         const date = day.dataset.date;
         if (!date) return;
