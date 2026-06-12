@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Profile | Keyscape Homes</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .profile-page { max-width: 600px; margin: 0 auto; padding: 2rem 5%; }
+    .profile-header { text-align: center; margin-bottom: 2rem; }
+    .profile-header h1 { color: var(--primary); font-size: 1.8rem; }
+    .profile-header p { color: #666; margin-top: 6px; }
+
+    .form-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; color: var(--dark); }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0;
+      border-radius: 10px; font-size: 1rem; font-family: inherit;
+      outline: none; transition: border-color 0.2s; background: #f8fafc;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--primary); background: white; }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .char-count { text-align: right; font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+    .field-hint { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+
+    .save-btn {
+      width: 100%; padding: 15px; background: var(--primary); color: white;
+      border: none; border-radius: 12px; font-size: 1.05rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; margin-top: 0.5rem;
+    }
+    .save-btn:hover { background: var(--accent); transform: translateY(-2px); }
+
+    .success-banner {
+      background: #d1fae5; border: 2px solid var(--accent); border-radius: 10px;
+      padding: 12px 16px; text-align: center; color: var(--primary);
+      font-weight: 600; margin-bottom: 1.5rem; display: none;
+      align-items: center; justify-content: center; gap: 8px;
+    }
+
+    .profile-preview {
+      background: var(--primary); color: white; border-radius: 16px;
+      padding: 1.5rem; display: flex; gap: 1.5rem; align-items: center; margin-bottom: 2rem;
+    }
+    .preview-avatar {
+      width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+      border: 3px solid rgba(255,255,255,0.3); flex-shrink: 0; background: #1a8c6b;
+    }
+    .preview-info h3 { font-size: 1.2rem; margin-bottom: 4px; }
+    .preview-info p { opacity: 0.85; font-size: 0.9rem; }
+    .preview-meta {
+      display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap;
+    }
+    .preview-meta span {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.82rem; opacity: 0.9;
+    }
+
+    /* Photo upload */
+    .photo-upload-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .avatar-circle {
+      width: 110px; height: 110px; border-radius: 50%;
+      object-fit: cover; border: 4px solid var(--primary);
+      background: #e2e8f0; display: block;
+    }
+    .upload-photo-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; background: #f0fdf4; color: var(--primary);
+      border: 2px solid var(--primary); border-radius: 10px;
+      font-weight: 600; font-size: 0.9rem; cursor: pointer;
+      transition: all 0.2s; position: relative; overflow: hidden;
+    }
+    .upload-photo-btn input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+      width: 100%; height: 100%;
+    }
+    .upload-photo-btn:hover { background: var(--primary); color: white; }
+    .photo-uploading {
+      color: var(--primary); font-size: 0.85rem; font-weight: 600; display: none;
+      align-items: center; gap: 6px;
+    }
+
+    .logout-link {
+      color: var(--primary); font-weight: 600; font-size: 0.9rem;
+      text-decoration: none; padding: 6px 14px; border: 2px solid var(--primary);
+      border-radius: 8px; transition: all 0.2s;
+    }
+    .logout-link:hover { background: var(--primary); color: white; }
+
+    .section-title {
+      font-size: 0.95rem; font-weight: 700; color: var(--primary);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin: 1.6rem 0 1rem; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0;
+    }
+
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <img src="logo/keyscape-logo.png" alt="KeyScape Logo" height="42">
+      </a>
+      <div class="nav-links">
+        <a href="index.html#listings" class="nav-link">Browse Homes</a>
+        <a href="list.html" class="nav-link">List Your Property</a>
+        <a href="index.html#how" class="nav-link">How it Works</a>
+      </div>
+      <div class="nav-auth">
+        <span id="navUser" style="color:#666; font-size:0.9rem;"></span>
+        <a href="my-listings.html" class="nav-link">My Listings</a>
+        <a href="#" id="logoutBtn" style="color:#ef4444;" class="nav-link">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburgerBtn">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="index.html#listings" class="nav-link">Browse Homes</a>
+      <a href="list.html" class="nav-link">List Your Property</a>
+      <a href="index.html#how" class="nav-link">How it Works</a>
+      <a href="my-listings.html" class="nav-link">My Listings</a>
+      <a href="#" id="mobileLogoutBtn" style="color:#ef4444;" class="nav-link">Logout</a>
+    </div>
+  </nav>
+
+  <div class="profile-page">
+    <div class="profile-header">
+      <h1 id="pageTitle">Complete Your Profile</h1>
+      <p id="pageSubtitle">Tell guests about yourself before listing your property</p>
+    </div>
+
+    <div class="success-banner" id="successBanner">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Profile saved successfully!
+    </div>
+
+    <!-- Live Preview -->
+    <div class="profile-preview">
+      <img class="preview-avatar" id="previewAvatar" src="" alt="Preview">
+      <div class="preview-info">
+        <h3 id="previewName">Your Name</h3>
+        <p id="previewBio">Your bio will appear here...</p>
+        <div class="preview-meta">
+          <span id="previewLanguages" style="display:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+            <span id="previewLanguagesText"></span>
+          </span>
+          <span id="previewHosting" style="display:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Hosting since <span id="previewHostingYear"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card">
+
+      <!-- Cloudinary photo upload -->
+      <div class="form-group">
+        <label>Profile Photo</label>
+        <div class="photo-upload-area">
+          <img class="avatar-circle" id="avatarPreview" src="" alt="Profile photo">
+          <div class="upload-photo-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Upload Photo
+            <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)">
+          </div>
+          <p class="photo-uploading" id="photoUploading">
+            <svg class="spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 11-9-9"/></svg>
+            Uploading...
+          </p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" id="hostName" placeholder="Afolabi Ibrahim O." oninput="updatePreview()">
+      </div>
+
+      <div class="form-group">
+        <label>Phone / WhatsApp *</label>
+        <input type="tel" id="hostPhone" placeholder="e.g. 08012345678">
+      </div>
+
+      <div class="form-group">
+        <label>Short Bio *</label>
+        <textarea id="hostBio" placeholder="Tell guests about yourself and your hosting style..." maxlength="200" oninput="updatePreview(); updateCharCount()"></textarea>
+        <div class="char-count"><span id="charCount">0</span>/200</div>
+      </div>
+
+      <p class="section-title">Hosting Details</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Languages Spoken *</label>
+          <input type="text" id="hostLanguages" placeholder="e.g. English, Yoruba" oninput="updatePreview()">
+          <div class="field-hint">Separate with commas</div>
+        </div>
+        <div class="form-group">
+          <label>Hosting Since *</label>
+          <input type="number" id="hostingSince" placeholder="e.g. 2020" min="2000" max="2026" oninput="updatePreview()">
+          <div class="field-hint">Year you started hosting</div>
+        </div>
+      </div>
+
+      <button class="save-btn" id="saveBtn" onclick="saveProfile()">Save Profile & Continue</button>
+    </div>
+  </div>
+
+  <footer><p>© 2026 Keyscape Homes. All rights reserved.</p></footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD34KXZcVyxnqN_wuP5GShI8uNbe6osXVQ",
+      authDomain: "keyscape-homes.firebaseapp.com",
+      databaseURL: "https://keyscape-homes-default-rtdb.firebaseio.com",
+      projectId: "keyscape-homes",
+      storageBucket: "keyscape-homes.firebasestorage.app",
+      messagingSenderId: "8066332433",
+      appId: "1:8066332433:web:571a5335e2796d3845feb0",
+      measurementId: "G-F9CP7R9BH5"
+    };
+
+    const CLOUDINARY_CLOUD = 'dv933cgea';
+    const CLOUDINARY_PRESET = 'keyscape_uploads';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    let currentUser = null;
+    let currentPhotoUrl = '';
+
+    // Generates an SVG-based avatar placeholder (no emoji/placeholder.com)
+    function avatarPlaceholder(name, size) {
+      const initial = (name || '?').charAt(0).toUpperCase();
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+        <rect width="100%" height="100%" rx="${size}" fill="#0f4c3a"/>
+        <text x="50%" y="50%" dy=".35em" text-anchor="middle" fill="#ffffff" font-family="Segoe UI, sans-serif" font-size="${size/2}" font-weight="600">${initial}</text>
+      </svg>`;
+      return `data:image/svg+xml;base64,${btoa(svg)}`;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+      document.getElementById('navUser').textContent = user.displayName || user.email;
+
+      const snap = await getDoc(doc(db, 'hosts', user.uid));
+      if (snap.exists()) {
+        const data = snap.data();
+        document.getElementById('hostName').value = data.name || '';
+        document.getElementById('hostPhone').value = data.phone || '';
+        document.getElementById('hostBio').value = data.bio || '';
+        document.getElementById('hostLanguages').value = data.languages || '';
+        document.getElementById('hostingSince').value = data.hostingSince || '';
+        currentPhotoUrl = data.photo || '';
+        if (currentPhotoUrl) {
+          document.getElementById('avatarPreview').src = currentPhotoUrl;
+          document.getElementById('previewAvatar').src = currentPhotoUrl;
+        }
+        if (data.profileComplete) {
+          document.getElementById('pageTitle').textContent = 'Edit Your Profile';
+          document.getElementById('pageSubtitle').textContent = 'Update your host information';
+          document.getElementById('saveBtn').textContent = 'Save Changes';
+        }
+        updatePreview();
+        updateCharCount();
+      } else {
+        updatePreview();
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.href = 'index.html';
+    });
+
+    document.getElementById('mobileLogoutBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.href = 'index.html';
+    });
+
+    document.getElementById('hamburgerBtn').addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('active');
+    });
+
+    document.querySelectorAll('.mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobileMenu').classList.remove('active');
+      });
+    });
+
+    window.handlePhotoUpload = async function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const uploading = document.getElementById('photoUploading');
+      uploading.style.display = 'flex';
+
+      document.getElementById('avatarPreview').src = URL.createObjectURL(file);
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_PRESET);
+        formData.append('folder', 'keyscape_hosts');
+
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+          method: 'POST', body: formData
+        });
+        const data = await res.json();
+        currentPhotoUrl = data.secure_url;
+
+        document.getElementById('avatarPreview').src = currentPhotoUrl;
+        document.getElementById('previewAvatar').src = currentPhotoUrl;
+      } catch (e) {
+        alert('Photo upload failed. Please try again.');
+      }
+
+      uploading.style.display = 'none';
+      event.target.value = '';
+    };
+
+    window.updatePreview = function() {
+      const name = document.getElementById('hostName').value || 'Your Name';
+      const bio = document.getElementById('hostBio').value || 'Your bio will appear here...';
+      const languages = document.getElementById('hostLanguages').value.trim();
+      const hostingSince = document.getElementById('hostingSince').value.trim();
+
+      document.getElementById('previewName').textContent = name;
+      document.getElementById('previewBio').textContent = bio;
+
+      if (!currentPhotoUrl) {
+        document.getElementById('previewAvatar').src = avatarPlaceholder(name, 80);
+        document.getElementById('avatarPreview').src = avatarPlaceholder(name, 110);
+      }
+
+      if (languages) {
+        document.getElementById('previewLanguages').style.display = 'inline-flex';
+        document.getElementById('previewLanguagesText').textContent = languages;
+      } else {
+        document.getElementById('previewLanguages').style.display = 'none';
+      }
+
+      if (hostingSince) {
+        document.getElementById('previewHosting').style.display = 'inline-flex';
+        document.getElementById('previewHostingYear').textContent = hostingSince;
+      } else {
+        document.getElementById('previewHosting').style.display = 'none';
+      }
+    };
+
+    window.updateCharCount = function() {
+      document.getElementById('charCount').textContent = document.getElementById('hostBio').value.length;
+    };
+
+    window.saveProfile = async function() {
+      if (!currentUser) return;
+      const name = document.getElementById('hostName').value.trim();
+      const phone = document.getElementById('hostPhone').value.trim();
+      const bio = document.getElementById('hostBio').value.trim();
+      const languages = document.getElementById('hostLanguages').value.trim();
+      const hostingSince = document.getElementById('hostingSince').value.trim();
+
+      if (!name || !phone || !bio || !languages || !hostingSince) {
+        alert('Please fill in all required fields, including languages and hosting since year.');
+        return;
+      }
+
+      const btn = document.getElementById('saveBtn');
+      btn.textContent = 'Saving...';
+      btn.disabled = true;
+
+      try {
+        await updateDoc(doc(db, 'hosts', currentUser.uid), {
+          name, phone, bio, languages, hostingSince,
+          photo: currentPhotoUrl,
+          profileComplete: true,
+          updatedAt: new Date().toISOString()
+        });
+
+        document.getElementById('successBanner').style.display = 'flex';
+        setTimeout(() => {
+          const params = new URLSearchParams(window.location.search);
+          if (params.get('setup') === 'true') {
+            window.location.href = 'list.html';
+          } else {
+            btn.textContent = 'Save Changes';
+            btn.disabled = false;
+            document.getElementById('successBanner').style.display = 'none';
+          }
+        }, 1500);
+      } catch (e) {
+        btn.textContent = 'Save Changes';
+        btn.disabled = false;
+        alert('Failed to save. Please try again.');
+      }
+    };
+  </script>
+</body>
+</html>

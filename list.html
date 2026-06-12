@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>List Your Property | Keyscape Homes</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .list-page { max-width: 700px; margin: 0 auto; padding: 2rem 5%; }
+    .list-page h1 { font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem; }
+    .list-page .subtitle { color: #666; margin-bottom: 2rem; }
+    .form-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+    .form-group { margin-bottom: 1.4rem; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--dark); font-size: 0.95rem; }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0;
+      border-radius: 10px; font-size: 1rem; font-family: inherit;
+      outline: none; transition: border-color 0.2s; background: #f8fafc;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); background: white; }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-group .field-hint { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .submit-btn {
+      background: var(--primary); color: white; border: none; padding: 16px;
+      border-radius: 12px; font-size: 1.1rem; font-weight: 600; width: 100%;
+      cursor: pointer; transition: all 0.3s; margin-top: 0.5rem;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .submit-btn:hover { background: var(--accent); transform: translateY(-2px); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .success-msg {
+      display: none; background: #d1fae5; border: 2px solid var(--accent);
+      border-radius: 12px; padding: 1.5rem; text-align: center; margin-top: 1.5rem;
+    }
+    .success-msg h3 {
+      color: var(--primary); margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .section-title {
+      font-size: 1rem; font-weight: 700; color: var(--primary);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin: 1.5rem 0 1rem; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0;
+    }
+    .host-preview {
+      background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px;
+      padding: 1rem 1.2rem; display: flex; gap: 12px; align-items: center; margin-bottom: 1.5rem;
+    }
+    .host-preview img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+    .host-preview h4 { font-size: 1rem; color: var(--primary); }
+    .host-preview p { font-size: 0.85rem; color: #666; }
+    .not-logged { text-align: center; padding: 3rem; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+    .not-logged .icon-circle {
+      width: 60px; height: 60px; border-radius: 50%; background: #f0fdf4;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem; color: var(--primary);
+    }
+    .not-logged h2 { color: var(--primary); margin-bottom: 1rem; }
+    .not-logged p { color: #666; margin-bottom: 1.5rem; }
+
+    /* Image Upload */
+    .upload-area {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #f8fafc;
+      position: relative;
+    }
+    .upload-area:hover { border-color: var(--primary); background: #f0fdf4; }
+    .upload-area input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+      width: 100%; height: 100%; border: none; padding: 0;
+    }
+    .upload-area .upload-icon {
+      display: flex; align-items: center; justify-content: center;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: #f0fdf4; color: var(--primary);
+      margin: 0 auto 10px;
+    }
+    .upload-area p { color: #666; font-size: 0.95rem; margin: 0; }
+    .upload-area .upload-hint { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+
+    .image-previews {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .preview-thumb {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      aspect-ratio: 1;
+      background: #e2e8f0;
+    }
+    .preview-thumb img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .preview-thumb .remove-img {
+      position: absolute; top: 4px; right: 4px;
+      background: rgba(0,0,0,0.6); color: white;
+      border: none; border-radius: 50%; width: 24px; height: 24px;
+      cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .preview-thumb .uploading-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+    }
+    .upload-progress {
+      display: none; align-items: center; gap: 8px;
+      font-size: 0.85rem; color: var(--primary); margin-top: 8px;
+      font-weight: 600;
+    }
+
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* Amenities checklist */
+    .amenity-category { margin-bottom: 1.2rem; }
+    .amenity-category h4 {
+      font-size: 0.85rem; font-weight: 700; color: var(--primary);
+      text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px;
+    }
+    .amenity-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px;
+    }
+    .amenity-option {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 10px;
+      cursor: pointer; transition: all 0.2s; font-size: 0.9rem;
+      background: #f8fafc;
+    }
+    .amenity-option:hover { border-color: var(--primary); }
+    .amenity-option.selected { border-color: var(--primary); background: #f0fdf4; color: var(--primary); font-weight: 600; }
+    .amenity-option input { display: none; }
+    .amenity-option svg { flex-shrink: 0; color: var(--primary); }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+  <nav>
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <img src="logo/keyscape-logo.png" alt="KeyScape Logo" height="42">
+      </a>
+
+      <div class="nav-links">
+        <a href="index.html#listings" class="nav-link">Browse Homes</a>
+        <a href="list.html" class="nav-link" style="color:var(--primary); font-weight:700;">List Your Property</a>
+        <a href="index.html#how" class="nav-link">How it Works</a>
+      </div>
+
+      <div class="nav-auth">
+        <span id="navUser" style="color:#666; font-size:0.9rem; margin-right:4px;"></span>
+        <a href="my-listings.html" id="myListingsLink" style="display:none;" class="nav-link">My Listings</a>
+        <a href="profile.html" id="profileLink" style="display:none;" class="nav-link">My Profile</a>
+        <a href="#" id="logoutBtn" style="display:none; color:#ef4444;" class="nav-link">Logout</a>
+      </div>
+
+      <button class="hamburger" id="hamburgerBtn">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="index.html#listings" class="nav-link">Browse Homes</a>
+      <a href="list.html" class="nav-link">List Your Property</a>
+      <a href="index.html#how" class="nav-link">How it Works</a>
+      <a href="my-listings.html" id="mobileMyListingsLink" style="display:none;" class="nav-link">My Listings</a>
+      <a href="profile.html" id="mobileProfileLink" style="display:none;" class="nav-link">My Profile</a>
+      <a href="#" id="mobileLogoutBtn" style="display:none; color:#ef4444;" class="nav-link">Logout</a>
+    </div>
+  </nav>
+
+  <div class="list-page">
+    <div id="notLoggedIn" style="display:none;">
+      <div class="not-logged">
+        <div class="icon-circle">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+        <h2>Sign in to List Your Property</h2>
+        <p>You need a Keyscape host account to submit a listing.</p>
+        <a href="signup.html" class="btn btn-primary" style="display:inline-block; margin-right:10px;">Create Account</a>
+        <a href="login.html" class="btn btn-outline" style="display:inline-block;">Log In</a>
+      </div>
+    </div>
+
+    <div id="listingForm" style="display:none;">
+      <h1 id="formTitle">List Your Property</h1>
+      <p class="subtitle" id="formSubtitle">Fill in your property details. We'll review and get back to you within 24 hours.</p>
+
+      <div class="host-preview" id="hostPreview">
+        <img id="hostPreviewImg" src="" alt="Host">
+        <div>
+          <h4 id="hostPreviewName">Loading...</h4>
+          <p id="hostPreviewBio">Host profile</p>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <p class="section-title">Property Details</p>
+
+        <div class="form-group">
+          <label>Property Name *</label>
+          <input type="text" id="propName" placeholder="e.g. Sunset Villa Lekki">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Area / Neighbourhood *</label>
+            <input type="text" id="propArea" placeholder="e.g. Ikate, Lekki">
+          </div>
+          <div class="form-group">
+            <label>Full Address *</label>
+            <input type="text" id="propAddress" placeholder="Street, Building">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Price per Night (₦) *</label>
+            <input type="number" id="propPrice" placeholder="e.g. 45000">
+          </div>
+          <div class="form-group">
+            <label>Max Guests</label>
+            <input type="number" id="propGuests" placeholder="e.g. 6">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Minimum Stay (nights) *</label>
+            <input type="number" id="propMinStay" placeholder="e.g. 2" min="1">
+          </div>
+          <div class="form-group">
+            <label></label>
+          </div>
+        </div>
+
+        <!-- Cloudinary image upload -->
+        <div class="form-group">
+          <label>Property Photos * <span style="color:#94a3b8; font-weight:400;">(up to 6 photos)</span></label>
+          <div class="upload-area" id="uploadArea">
+            <input type="file" id="imageInput" accept="image/*" multiple onchange="handleImageUpload(event)">
+            <div class="upload-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+            <p>Tap to upload photos</p>
+            <p class="upload-hint">JPG, PNG supported · Max 10MB each</p>
+          </div>
+          <div class="upload-progress" id="uploadProgress">
+            <svg class="spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 11-9-9"/></svg>
+            <span id="uploadProgressText">Uploading photos...</span>
+          </div>
+          <div class="image-previews" id="imagePreviews"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Short Description</label>
+          <textarea id="propDesc" placeholder="Describe what makes your property special..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Amenities <span style="color:#94a3b8; font-weight:400;">(select all that apply)</span></label>
+          <div id="amenitiesChecklist"></div>
+        </div>
+
+        <p class="section-title">House Rules</p>
+
+        <div class="form-group">
+          <label>House Rules *</label>
+          <textarea id="propRules" placeholder="One rule per line, e.g.&#10;No smoking inside the property&#10;Check-in after 2:00 PM&#10;Check-out before 12:00 PM"></textarea>
+          <div class="field-hint">Write one rule per line</div>
+        </div>
+
+        <button class="submit-btn" id="submitBtn" onclick="submitListing()">
+          <span id="submitBtnText">Submit for Review</span>
+        </button>
+
+        <div class="success-msg" id="successMsg">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Submission Received!
+          </h3>
+          <p id="successText">Thanks! We'll review your listing and contact you within 24 hours.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer><p>© 2026 Keyscape Homes. All rights reserved.</p></footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD34KXZcVyxnqN_wuP5GShI8uNbe6osXVQ",
+      authDomain: "keyscape-homes.firebaseapp.com",
+      databaseURL: "https://keyscape-homes-default-rtdb.firebaseio.com",
+      projectId: "keyscape-homes",
+      storageBucket: "keyscape-homes.firebasestorage.app",
+      messagingSenderId: "8066332433",
+      appId: "1:8066332433:web:571a5335e2796d3845feb0",
+      measurementId: "G-F9CP7R9BH5"
+    };
+
+    const CLOUDINARY_CLOUD = 'dv933cgea';
+    const CLOUDINARY_PRESET = 'keyscape_uploads';
+
+    // EmailJS — admin new-listing notification
+    const EMAILJS_SERVICE_ID = 'service_42jjrjs';
+    const EMAILJS_TEMPLATE_ID = 'template_vzltrp8';
+    const EMAILJS_PUBLIC_KEY = 'K5Z74G1ipcpe1WhHL';
+    const ADMIN_EMAIL = 'keyscapeltd@gmail.com';
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    let hostProfile = null;
+    let uploadedImageUrls = [];
+
+    // Edit mode — if ?edit=<firestoreId> is present
+    const params = new URLSearchParams(window.location.search);
+    const editId = params.get('edit');
+
+    function avatarPlaceholder(name, size) {
+      const initial = (name || '?').charAt(0).toUpperCase();
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+        <rect width="100%" height="100%" rx="${size}" fill="#0f4c3a"/>
+        <text x="50%" y="50%" dy=".35em" text-anchor="middle" fill="#ffffff" font-family="Segoe UI, sans-serif" font-size="${size/2}" font-weight="600">${initial}</text>
+      </svg>`;
+      return `data:image/svg+xml;base64,${btoa(svg)}`;
+    }
+
+    // ===== Amenities checklist (matches property.html AMENITY_DB) =====
+    const AMENITY_DB = {
+      "Hairdryer": { cat: "Bathroom", icon: `<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 10-14 0"/><path d="M12 19v3"/>` },
+      "Shampoo": { cat: "Bathroom", icon: `<path d="M8 2h8v4H8z"/><path d="M6 6h12v14a2 2 0 01-2 2H8a2 2 0 01-2-2V6z"/>` },
+      "Conditioner": { cat: "Bathroom", icon: `<path d="M8 2h8v4H8z"/><path d="M6 6h12v14a2 2 0 01-2 2H8a2 2 0 01-2-2V6z"/><line x1="9" y1="12" x2="15" y2="12"/>` },
+      "Body soap": { cat: "Bathroom", icon: `<rect x="4" y="8" width="16" height="12" rx="2"/><path d="M8 8V5a2 2 0 012-2h4a2 2 0 012 2v3"/>` },
+      "Hot water": { cat: "Bathroom", icon: `<path d="M12 2v6M8 6l4-4 4 4"/><path d="M5 12a7 7 0 0014 0"/>` },
+      "Bidet": { cat: "Bathroom", icon: `<rect x="5" y="11" width="14" height="8" rx="2"/><path d="M9 11V8a3 3 0 016 0v3"/>` },
+      "Washing machine": { cat: "Bedroom and laundry", icon: `<rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><circle cx="6" cy="6" r="1"/>` },
+      "Dryer": { cat: "Bedroom and laundry", icon: `<rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 10v3l2 2"/>` },
+      "Hangers": { cat: "Bedroom and laundry", icon: `<path d="M12 3a2 2 0 00-2 2c0 1 1 1 2 2l8 5H4l8-5c1-1 2-1 2-2a2 2 0 00-2-2z"/><line x1="2" y1="17" x2="22" y2="17"/>` },
+      "Bed linen": { cat: "Bedroom and laundry", icon: `<path d="M2 9h20v6H2z"/><path d="M2 15v4M22 15v4M6 9V6a2 2 0 012-2h8a2 2 0 012 2v3"/>` },
+      "Iron": { cat: "Bedroom and laundry", icon: `<path d="M3 17l3-9h12l3 9z"/><line x1="3" y1="17" x2="21" y2="17"/><circle cx="17" cy="9" r="1"/>` },
+      "Clothes storage": { cat: "Bedroom and laundry", icon: `<rect x="3" y="3" width="18" height="18" rx="1"/><line x1="12" y1="3" x2="12" y2="21"/>` },
+      "TV": { cat: "Entertainment", icon: `<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="8" y1="22" x2="16" y2="22"/><line x1="12" y1="19" x2="12" y2="22"/>` },
+      "PS5 Gaming Console": { cat: "Entertainment", icon: `<rect x="3" y="6" width="18" height="12" rx="2"/><line x1="7" y1="10" x2="7" y2="14"/><line x1="5" y1="12" x2="9" y2="12"/><circle cx="16" cy="10" r="1"/><circle cx="18" cy="13" r="1"/>` },
+      "Netflix, YouTube & Prime": { cat: "Entertainment", icon: `<rect x="2" y="4" width="20" height="14" rx="2"/><polygon points="10 9 15 12 10 15" fill="currentColor"/>` },
+      "Air conditioning": { cat: "Heating and cooling", icon: `<rect x="2" y="5" width="20" height="6" rx="1"/><line x1="6" y1="15" x2="6" y2="19"/><line x1="12" y1="15" x2="12" y2="19"/><line x1="18" y1="15" x2="18" y2="19"/>` },
+      "Fans": { cat: "Heating and cooling", icon: `<circle cx="12" cy="12" r="2"/><path d="M12 10c0-3 2-6 5-6s2 4-1 5"/><path d="M12 14c0 3-2 6-5 6s-2-4 1-5"/><path d="M14 12c3 0 6 2 6 5s-4 2-5-1"/>` },
+      "Heating": { cat: "Heating and cooling", icon: `<path d="M12 2v20M8 6l4-4 4 4M8 18l4 4 4-4"/>` },
+      "Lock on bedroom door": { cat: "Privacy and safety", icon: `<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/><circle cx="12" cy="16" r="1.5"/>` },
+      "Exterior security cameras": { cat: "Privacy and safety", icon: `<rect x="2" y="7" width="14" height="10" rx="2"/><path d="M16 10l6-3v10l-6-3"/>` },
+      "Smoke alarm": { cat: "Privacy and safety", icon: `<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>` },
+      "Fire extinguisher": { cat: "Privacy and safety", icon: `<rect x="9" y="7" width="6" height="14" rx="2"/><line x1="12" y1="2" x2="12" y2="7"/><path d="M9 4h6"/><path d="M15 9h3l2-2"/>` },
+      "Wifi": { cat: "Internet and office", icon: `<path d="M5 13a10 10 0 0114 0"/><path d="M8.5 16.5a5 5 0 017 0"/><line x1="12" y1="20" x2="12" y2="20.01"/>` },
+      "Dedicated workspace": { cat: "Internet and office", icon: `<rect x="2" y="4" width="20" height="12" rx="1"/><line x1="2" y1="20" x2="22" y2="20"/><line x1="12" y1="16" x2="12" y2="20"/>` },
+      "Kitchen": { cat: "Kitchen and dining", icon: `<path d="M3 3v18M3 9h18M9 3v6"/><path d="M14 14v7"/><circle cx="18" cy="14" r="3"/>` },
+      "Fridge": { cat: "Kitchen and dining", icon: `<rect x="5" y="2" width="14" height="20" rx="1"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="9" y1="5" x2="9" y2="7"/><line x1="9" y1="12" x2="9" y2="14"/>` },
+      "Freezer": { cat: "Kitchen and dining", icon: `<rect x="5" y="2" width="14" height="20" rx="1"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="9" y1="5" x2="9" y2="9"/><line x1="9" y1="15" x2="9" y2="19"/>` },
+      "Microwave": { cat: "Kitchen and dining", icon: `<rect x="2" y="5" width="20" height="14" rx="2"/><rect x="5" y="8" width="10" height="8" rx="1"/><circle cx="18" cy="12" r="1.5"/>` },
+      "Oven": { cat: "Kitchen and dining", icon: `<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><rect x="6" y="12" width="12" height="6" rx="1"/>` },
+      "Cooker": { cat: "Kitchen and dining", icon: `<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8" cy="9" r="2"/><circle cx="16" cy="9" r="2"/><circle cx="8" cy="15" r="2"/><circle cx="16" cy="15" r="2"/>` },
+      "Cooking basics": { cat: "Kitchen and dining", icon: `<path d="M6 2v6a3 3 0 003 3v11M9 11a3 3 0 003-3V2M15 2c-1 4 0 6 2 8v11"/>` },
+      "Crockery and cutlery": { cat: "Kitchen and dining", icon: `<path d="M11 2v8a3 3 0 11-6 0V2M8 10v12M16 2c-2 0-3 2-3 4s1 4 3 4 3-2 3-4-1-4-3-4zM16 10v12"/>` },
+      "Blender": { cat: "Kitchen and dining", icon: `<path d="M7 2h10l-1 9H8z"/><rect x="6" y="11" width="12" height="11" rx="1"/>` },
+      "Wine glasses": { cat: "Kitchen and dining", icon: `<path d="M8 2h8l-1 7a3 3 0 01-6 0z"/><line x1="12" y1="9" x2="12" y2="18"/><line x1="8" y1="22" x2="16" y2="22"/><line x1="12" y1="18" x2="12" y2="22"/>` },
+      "Two Private Balconies": { cat: "Outdoor", icon: `<path d="M3 21V8l9-6 9 6v13"/><line x1="3" y1="13" x2="21" y2="13"/><line x1="9" y1="21" x2="9" y2="13"/><line x1="15" y1="21" x2="15" y2="13"/>` },
+      "Swimming Pool": { cat: "Outdoor", icon: `<path d="M2 12c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 17c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><line x1="6" y1="4" x2="6" y2="8"/><line x1="12" y1="2" x2="12" y2="8"/><line x1="18" y1="4" x2="18" y2="8"/>` },
+      "Free parking on premises": { cat: "Parking and facilities", icon: `<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 16V8h4a3 3 0 010 6H9"/>` },
+      "Elevator": { cat: "Parking and facilities", icon: `<rect x="5" y="2" width="14" height="20" rx="1"/><polyline points="10 8 12 6 14 8"/><polyline points="10 16 12 18 14 16"/>` },
+      "Gym": { cat: "Parking and facilities", icon: `<path d="M6 7v10M18 7v10M2 12h2M20 12h2M6 12h12"/>` },
+      "Pool table": { cat: "Parking and facilities", icon: `<rect x="2" y="6" width="20" height="12" rx="1"/><circle cx="7" cy="12" r="1.5" fill="currentColor"/><circle cx="17" cy="12" r="1.5" fill="currentColor"/>` }
+    };
+
+    const CATEGORY_ORDER = [
+      "Bathroom", "Bedroom and laundry", "Entertainment", "Heating and cooling",
+      "Privacy and safety", "Internet and office", "Kitchen and dining", "Outdoor", "Parking and facilities"
+    ];
+
+    let selectedAmenities = [];
+
+    function renderAmenitiesChecklist() {
+      const grouped = {};
+      Object.entries(AMENITY_DB).forEach(([name, info]) => {
+        if (!grouped[info.cat]) grouped[info.cat] = [];
+        grouped[info.cat].push({ name, icon: info.icon });
+      });
+
+      const html = CATEGORY_ORDER.map(cat => `
+        <div class="amenity-category">
+          <h4>${cat}</h4>
+          <div class="amenity-grid">
+            ${grouped[cat].map(item => `
+              <label class="amenity-option" data-name="${item.name}">
+                <input type="checkbox" value="${item.name}" onchange="toggleAmenity(this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${item.icon}</svg>
+                ${item.name}
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('amenitiesChecklist').innerHTML = html;
+    }
+
+    window.toggleAmenity = function(checkbox) {
+      const label = checkbox.closest('.amenity-option');
+      const name = checkbox.value;
+      if (checkbox.checked) {
+        label.classList.add('selected');
+        if (!selectedAmenities.includes(name)) selectedAmenities.push(name);
+      } else {
+        label.classList.remove('selected');
+        selectedAmenities = selectedAmenities.filter(a => a !== name);
+      }
+    };
+
+    function setSelectedAmenities(amenitiesArr) {
+      selectedAmenities = [...(amenitiesArr || [])];
+      document.querySelectorAll('.amenity-option').forEach(label => {
+        const name = label.dataset.name;
+        const checkbox = label.querySelector('input');
+        if (selectedAmenities.includes(name)) {
+          checkbox.checked = true;
+          label.classList.add('selected');
+        }
+      });
+    }
+
+    renderAmenitiesChecklist();
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        document.getElementById('notLoggedIn').style.display = 'block';
+        return;
+      }
+      const snap = await getDoc(doc(db, 'hosts', user.uid));
+      if (!snap.exists() || !snap.data().profileComplete) {
+        window.location.href = 'profile.html?setup=true';
+        return;
+      }
+      hostProfile = snap.data();
+      document.getElementById('listingForm').style.display = 'block';
+      document.getElementById('navUser').textContent = hostProfile.name;
+      document.getElementById('myListingsLink').style.display = 'inline';
+      document.getElementById('mobileMyListingsLink').style.display = 'block';
+      document.getElementById('profileLink').style.display = 'inline';
+      document.getElementById('mobileProfileLink').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'inline';
+      document.getElementById('mobileLogoutBtn').style.display = 'block';
+      document.getElementById('hostPreviewName').textContent = hostProfile.name;
+      document.getElementById('hostPreviewBio').textContent = hostProfile.bio?.substring(0, 60) + (hostProfile.bio?.length > 60 ? '...' : '');
+      document.getElementById('hostPreviewImg').src = hostProfile.photo || avatarPlaceholder(hostProfile.name, 50);
+
+      // If editing, load existing listing data
+      if (editId) {
+        const listingSnap = await getDoc(doc(db, 'listings', editId));
+        if (listingSnap.exists()) {
+          const data = listingSnap.data();
+          if (data.hostUid !== user.uid) {
+            alert("You don't have permission to edit this listing.");
+            window.location.href = 'my-listings.html';
+            return;
+          }
+          loadListingForEdit(data);
+        }
+      }
+    });
+
+    function loadListingForEdit(data) {
+      document.getElementById('formTitle').textContent = 'Edit Your Property';
+      document.getElementById('formSubtitle').textContent = 'Update your property details below.';
+      document.getElementById('submitBtnText').textContent = 'Save Changes';
+      document.getElementById('successText').textContent = 'Your listing has been updated.';
+
+      document.getElementById('propName').value = data.name || '';
+      document.getElementById('propArea').value = (data.location || '').replace(', Lagos', '');
+      document.getElementById('propAddress').value = data.address || '';
+      document.getElementById('propPrice').value = (data.price || '').replace(/[^\d]/g, '');
+      document.getElementById('propGuests').value = data.maxGuests !== 'N/A' ? data.maxGuests : '';
+      document.getElementById('propMinStay').value = data.minStay || '';
+      document.getElementById('propDesc').value = data.description || '';
+      setSelectedAmenities(data.amenities);
+      document.getElementById('propRules').value = (data.houseRules || []).join('\n');
+
+      uploadedImageUrls = data.images || (data.image ? [data.image] : []);
+      renderExistingPreviews();
+    }
+
+    function renderExistingPreviews() {
+      const previews = document.getElementById('imagePreviews');
+      previews.innerHTML = '';
+      uploadedImageUrls.forEach((url, idx) => {
+        const thumbEl = document.createElement('div');
+        thumbEl.className = 'preview-thumb';
+        thumbEl.innerHTML = `
+          <img src="${url}" alt="Photo ${idx + 1}">
+          <button class="remove-img" onclick="removeImageByIndex(${idx})">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        `;
+        previews.appendChild(thumbEl);
+      });
+    }
+
+    window.removeImageByIndex = function(idx) {
+      uploadedImageUrls.splice(idx, 1);
+      renderExistingPreviews();
+    };
+
+    document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.href = 'index.html';
+    });
+
+    document.getElementById('mobileLogoutBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.href = 'index.html';
+    });
+
+    document.getElementById('hamburgerBtn').addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('active');
+    });
+
+    document.querySelectorAll('.mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobileMenu').classList.remove('active');
+      });
+    });
+
+    async function uploadToCloudinary(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_PRESET);
+      formData.append('folder', 'keyscape_listings');
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      return data.secure_url;
+    }
+
+    window.handleImageUpload = async function(event) {
+      const files = Array.from(event.target.files);
+      if (!files.length) return;
+
+      const remaining = 6 - uploadedImageUrls.length;
+      if (remaining <= 0) {
+        alert('Maximum 6 photos allowed.');
+        return;
+      }
+
+      const toUpload = files.slice(0, remaining);
+      const progress = document.getElementById('uploadProgress');
+      const progressText = document.getElementById('uploadProgressText');
+      progress.style.display = 'flex';
+      progressText.textContent = `Uploading ${toUpload.length} photo${toUpload.length > 1 ? 's' : ''}...`;
+
+      const previews = document.getElementById('imagePreviews');
+
+      for (let i = 0; i < toUpload.length; i++) {
+        const file = toUpload[i];
+        progressText.textContent = `Uploading photo ${i + 1} of ${toUpload.length}...`;
+
+        const thumbId = `thumb-${Date.now()}-${i}`;
+        const thumbEl = document.createElement('div');
+        thumbEl.className = 'preview-thumb';
+        thumbEl.id = thumbId;
+        thumbEl.innerHTML = `
+          <img src="${URL.createObjectURL(file)}" alt="uploading">
+          <div class="uploading-overlay">
+            <svg class="spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 11-9-9"/></svg>
+          </div>
+        `;
+        previews.appendChild(thumbEl);
+
+        try {
+          const url = await uploadToCloudinary(file);
+          uploadedImageUrls.push(url);
+
+          thumbEl.innerHTML = `
+            <img src="${url}" alt="Photo ${uploadedImageUrls.length}">
+            <button class="remove-img" onclick="removeImage('${url}', '${thumbId}')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          `;
+        } catch (e) {
+          thumbEl.remove();
+          alert(`Failed to upload photo ${i + 1}. Please try again.`);
+        }
+      }
+
+      progress.style.display = 'none';
+      event.target.value = '';
+    };
+
+    window.removeImage = function(url, thumbId) {
+      uploadedImageUrls = uploadedImageUrls.filter(u => u !== url);
+      document.getElementById(thumbId)?.remove();
+    };
+
+    window.submitListing = async function() {
+      const required = [
+        { id: 'propName', label: 'Property Name' },
+        { id: 'propArea', label: 'Area' },
+        { id: 'propAddress', label: 'Address' },
+        { id: 'propPrice', label: 'Price' },
+        { id: 'propMinStay', label: 'Minimum Stay' },
+        { id: 'propRules', label: 'House Rules' },
+      ];
+
+      for (const field of required) {
+        if (!document.getElementById(field.id).value.trim()) {
+          alert(`Please fill in: ${field.label}`);
+          document.getElementById(field.id).focus();
+          return;
+        }
+      }
+
+      if (uploadedImageUrls.length === 0) {
+        alert('Please upload at least one property photo.');
+        return;
+      }
+
+      const btn = document.getElementById('submitBtn');
+      const btnText = document.getElementById('submitBtnText');
+      btnText.textContent = editId ? 'Saving...' : 'Submitting...';
+      btn.disabled = true;
+
+      const houseRules = document.getElementById('propRules').value
+        .split('\n').map(r => r.trim()).filter(Boolean);
+
+      const listingData = {
+        name: document.getElementById('propName').value.trim(),
+        location: `${document.getElementById('propArea').value.trim()}, Lagos`,
+        address: document.getElementById('propAddress').value.trim(),
+        price: `₦${parseInt(document.getElementById('propPrice').value).toLocaleString()}`,
+        image: uploadedImageUrls[0],
+        images: uploadedImageUrls,
+        description: document.getElementById('propDesc').value.trim(),
+        amenities: selectedAmenities,
+        maxGuests: document.getElementById('propGuests').value || 'N/A',
+        minStay: parseInt(document.getElementById('propMinStay').value),
+        houseRules: houseRules,
+        hostUid: auth.currentUser.uid,
+        hostName: hostProfile.name,
+        hostPhone: hostProfile.phone,
+        hostPhoto: hostProfile.photo || '',
+        hostBio: hostProfile.bio || '',
+        hostLanguages: hostProfile.languages || '',
+        hostEmail: hostProfile.email || auth.currentUser.email || '',
+        hostingSince: hostProfile.hostingSince || '',
+      };
+
+      if (editId) {
+        // EDIT MODE — update existing doc, keep status as-is (live immediately)
+        await updateDoc(doc(db, 'listings', editId), {
+          ...listingData,
+          updatedAt: new Date().toISOString()
+        });
+
+        document.getElementById('successMsg').style.display = 'block';
+        btnText.textContent = 'Save Changes';
+        btn.disabled = false;
+
+        setTimeout(() => { window.location.href = 'my-listings.html'; }, 1200);
+        return;
+      }
+
+      // NEW LISTING
+      listingData.link = '#';
+      listingData.status = 'pending';
+      listingData.submittedAt = new Date().toISOString();
+
+      await addDoc(collection(db, 'listings'), listingData);
+
+      // Notify admin via email — fully automatic, no popup
+      const adminMessage =
+        `A new property listing has been submitted and is awaiting review.\n\n` +
+        `Property: ${listingData.name}\n` +
+        `Location: ${listingData.location}\n` +
+        `Address: ${listingData.address}\n` +
+        `Price: ${listingData.price}/night\n\n` +
+        `Host: ${listingData.hostName}\n` +
+        `Phone: ${listingData.hostPhone}\n` +
+        `Email: ${listingData.hostEmail || 'N/A'}\n\n` +
+        `Amenities: ${listingData.amenities.join(', ') || 'N/A'}\n` +
+        `${listingData.images.length} photo(s) uploaded\n` +
+        `First photo: ${listingData.image}\n\n` +
+        `Log in to the admin panel to review and approve or reject this listing.`;
+
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          to_email: ADMIN_EMAIL,
+          to_name: 'Admin',
+          property_name: listingData.name,
+          status: 'submitted for review',
+          message: adminMessage
+        });
+      } catch (e) {
+        console.error('Failed to send admin notification email:', e);
+      }
+
+      document.getElementById('successMsg').style.display = 'block';
+      btnText.textContent = 'Submit for Review';
+      btn.disabled = false;
+      uploadedImageUrls = [];
+      document.getElementById('imagePreviews').innerHTML = '';
+      selectedAmenities = [];
+      document.querySelectorAll('.amenity-option').forEach(label => {
+        label.classList.remove('selected');
+        label.querySelector('input').checked = false;
+      });
+      ['propName','propArea','propAddress','propPrice','propGuests','propMinStay','propDesc','propRules']
+        .forEach(id => document.getElementById(id).value = '');
+    };
+  </script>
+</body>
+</html>

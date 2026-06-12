@@ -7,72 +7,364 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Navigation -->
+    <!-- Navigation -->
   <nav>
-  <div class="nav-container">
-    <div class="logo">
-      <img src="logo/keyscape-logo.png" alt="KeyScape Logo" height="40">
+    <div class="nav-container">
+      <div class="logo">
+        <img src="logo/keyscape-logo.png" alt="KeyScape Logo" height="42">
+      </div>
+      
+      <div class="nav-links">
+        <a href="#listings" class="nav-link">Browse Homes</a>
+        <a href="list.html" class="nav-link">List Your Property</a>
+        <a href="#how" class="nav-link">How it Works</a>
+      </div>
+
+      <div class="nav-auth">
+        <a href="login.html" id="navLoginBtn" class="nav-link">Log In</a>
+        <span id="navUserName" style="display:none; color:#0f4c3a; font-weight:600; margin-right:12px;"></span>
+        <a href="my-listings.html" id="navMyListingsBtn" style="display:none;" class="nav-link">My Listings</a>
+        <a href="profile.html" id="navProfileBtn" style="display:none;" class="nav-link">My Profile</a>
+        <a href="#" id="navLogoutBtn" style="display:none; color:#ef4444;" class="nav-link">Logout</a>
+      </div>
+
+      <button class="hamburger" id="hamburgerBtn">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
     </div>
-    
-    <!-- Desktop Links -->
-    <div class="nav-links">
-      <a href="#">Browse Homes</a>
-      <a href="#">List Your Property</a>
-      <a href="#">How it Works</a>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#listings" class="nav-link">Browse Homes</a>
+      <a href="list.html" class="nav-link">List Your Property</a>
+      <a href="#how" class="nav-link">How it Works</a>
+      <a href="login.html" id="mobileLoginBtn" class="nav-link">Log In</a>
+      <a href="my-listings.html" id="mobileMyListingsBtn" style="display:none;" class="nav-link">My Listings</a>
+      <a href="profile.html" id="mobileProfileBtn" style="display:none;" class="nav-link">My Profile</a>
+      <a href="#" id="mobileLogoutBtn" style="display:none; color:#ef4444;" class="nav-link">Logout</a>
     </div>
+  </nav>
 
-    <!-- Hamburger -->
-    <button class="hamburger" id="hamburgerBtn">☰</button>
-  </div>
-
-  <!-- Mobile Menu -->
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="#">Browse Homes</a>
-    <a href="#">List Your Property</a>
-    <a href="#">How it Works</a>
-  </div>
-</nav>
-
-  <!-- Hero Section -->
+  <!-- Hero -->
   <section class="hero">
     <div class="hero-content">
       <h1>Stay Different.<br>Stay Premium.</h1>
       <p>Discover luxury shortlet homes across Lagos</p>
-      
       <div class="search-bar">
-        <input type="text" placeholder="Where are you going?">
-        <button>Search Homes</button>
+        <input type="text" id="searchInput" placeholder="Search by name or location...">
+        <button onclick="searchListings()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle; margin-right:6px;">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Search Homes
+        </button>
       </div>
     </div>
   </section>
 
   <!-- Featured Properties -->
-  <section class="featured">
+  <section class="featured" id="listings">
     <h2>Featured Homes</h2>
-    <div class="property-grid">
-      <!-- AOI Crib - Fully Clickable -->
-      <a href="aoicrib/index.html" class="property-card">
-        <img src="images/aoi-crib.jpg" alt="AOI Crib">
-        <div class="card-content">
-          <h3>AOI Crib Apartment</h3>
-          <p class="location">Thore Signature Building, Gbangbala Street, Ikate, Lekki, Lagos</p>
-          <p class="price">₦45,000 <span>per night</span></p>
-          <span class="view-details">View Details →</span>
+    <div id="loadingState" style="text-align:center; padding:3rem; color:#666;">
+      <p>Loading properties...</p>
+    </div>
+    <div id="noResults" style="display:none; text-align:center; padding:2rem; color:#666;">
+      No properties found matching your search.
+    </div>
+    <div class="property-grid" id="propertyGrid"></div>
+  </section>
+
+  <!-- How it Works -->
+  <section class="how-it-works" id="how">
+    <div class="how-inner">
+      <h2>How it Works</h2>
+      <p class="how-subtitle">Booking or listing a property on Keyscape is simple and fast</p>
+
+      <div class="how-tabs">
+        <button class="how-tab active" onclick="switchHow('guest', this)">For Guests</button>
+        <button class="how-tab" onclick="switchHow('host', this)">For Hosts</button>
+      </div>
+
+      <!-- Guest Steps -->
+      <div class="how-steps" id="guestSteps">
+        <div class="how-step">
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </div>
+          <div class="step-text">
+            <h3>Search</h3>
+            <p>Browse verified shortlet apartments across Lagos by location or property name.</p>
+          </div>
         </div>
-      </a>
+        <div class="step-divider"></div>
+        <div class="how-step">
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <div class="step-text">
+            <h3>Pick Your Dates</h3>
+            <p>Select your check-in and check-out dates directly on the property page.</p>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="how-step">
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+          </div>
+          <div class="step-text">
+            <h3>Book via WhatsApp</h3>
+            <p>Confirm your booking instantly by chatting directly with the host on WhatsApp.</p>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="how-step">
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </div>
+          <div class="step-text">
+            <h3>Check In</h3>
+            <p>Arrive at your premium shortlet and enjoy a seamless, comfortable stay.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Host Steps -->
+      <div class="how-steps" id="hostSteps" style="display:none;">
+        <div class="how-step">
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="step-text">
+            <h3>Create an Account</h3>
+            <p>Sign up with your email or Google account and complete your host profile.</p>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="how-step">
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
+          </div>
+          <div class="step-text">
+            <h3>Submit Your Listing</h3>
+            <p>Fill in your property details, upload photos, and set your nightly price.</p>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="how-step">
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <div class="step-text">
+            <h3>Get Approved</h3>
+            <p>Our team reviews your listing within 24 hours and publishes it on the platform.</p>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="how-step">
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+            </svg>
+          </div>
+          <div class="step-text">
+            <h3>Start Earning</h3>
+            <p>Guests discover your property and reach out directly via WhatsApp to book.</p>
+          </div>
+        </div>
+      </div>
+
+      
     </div>
   </section>
 
   <footer>
     <p>© 2026 Keyscape Homes. All rights reserved.</p>
   </footer>
-  <script>
-  const hamburgerBtn = document.getElementById('hamburgerBtn');
-  const mobileMenu = document.getElementById('mobileMenu');
 
-  hamburgerBtn.addEventListener('click', () => {
-    mobileMenu.classList.toggle('active');
-  });
-</script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD34KXZcVyxnqN_wuP5GShI8uNbe6osXVQ",
+      authDomain: "keyscape-homes.firebaseapp.com",
+      databaseURL: "https://keyscape-homes-default-rtdb.firebaseio.com",
+      projectId: "keyscape-homes",
+      storageBucket: "keyscape-homes.firebasestorage.app",
+      messagingSenderId: "8066332433",
+      appId: "1:8066332433:web:571a5335e2796d3845feb0",
+      measurementId: "G-F9CP7R9BH5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // No static listings — all properties come from Firestore
+    let allListings = [];
+
+    const iconLocation = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+    const iconArrow = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById('navLoginBtn').style.display = 'none';
+        document.getElementById('navUserName').style.display = 'inline';
+        document.getElementById('navUserName').textContent = user.displayName || user.email;
+        document.getElementById('navMyListingsBtn').style.display = 'inline';
+        document.getElementById('navProfileBtn').style.display = 'inline';
+        document.getElementById('navLogoutBtn').style.display = 'inline';
+        document.getElementById('mobileLoginBtn').style.display = 'none';
+        document.getElementById('mobileMyListingsBtn').style.display = 'block';
+        document.getElementById('mobileProfileBtn').style.display = 'block';
+        document.getElementById('mobileLogoutBtn').style.display = 'block';
+      } else {
+        document.getElementById('navLoginBtn').style.display = 'inline';
+        document.getElementById('navUserName').style.display = 'none';
+        document.getElementById('navMyListingsBtn').style.display = 'none';
+        document.getElementById('navProfileBtn').style.display = 'none';
+        document.getElementById('navLogoutBtn').style.display = 'none';
+        document.getElementById('mobileLoginBtn').style.display = 'block';
+        document.getElementById('mobileMyListingsBtn').style.display = 'none';
+        document.getElementById('mobileProfileBtn').style.display = 'none';
+        document.getElementById('mobileLogoutBtn').style.display = 'none';
+      }
+    });
+
+    document.getElementById('navLogoutBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.reload();
+    });
+
+    document.getElementById('mobileLogoutBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.reload();
+    });
+
+    async function loadFirestoreListings() {
+      try {
+        const q = query(collection(db, 'listings'), where('status', '==', 'approved'));
+        const snap = await getDocs(q);
+        snap.docs.forEach(d => {
+          const data = d.data();
+          allListings.push({
+            id: d.id,
+            name: data.name,
+            location: data.location,
+            price: data.price,
+            image: data.image,
+            link: `/property.html?id=${d.id}`,
+            amenities: data.amenities || [],
+            hostName: data.hostName,
+            hostPhoto: data.hostPhoto
+          });
+        });
+      } catch (e) {
+        console.log('Could not load Firestore listings:', e);
+      }
+      document.getElementById('loadingState').style.display = 'none';
+      renderListings(allListings);
+    }
+
+    function renderListings(data) {
+      const grid = document.getElementById('propertyGrid');
+      const noResults = document.getElementById('noResults');
+      document.getElementById('loadingState').style.display = 'none';
+
+      if (data.length === 0) {
+        grid.innerHTML = '';
+        noResults.style.display = 'block';
+        return;
+      }
+
+      noResults.style.display = 'none';
+      grid.innerHTML = data.map(p => `
+        <a href="${p.link}" class="property-card">
+          <img src="${p.image}" alt="${p.name}" onerror="this.src='images/placeholder.jpg'">
+          <div class="card-content">
+            <h3>${p.name}</h3>
+            <p class="location" style="display:flex; align-items:center; gap:5px;">
+              ${iconLocation} ${p.location}
+            </p>
+            <p class="price">${p.price} <span>per night</span></p>
+            ${p.hostName ? `
+              <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+                <img src="${p.hostPhoto || ''}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;" alt="${p.hostName}" onerror="this.style.display='none'">
+                <span style="font-size:0.85rem; color:#666;">${p.hostName}</span>
+              </div>
+            ` : ''}
+            <span class="view-details" style="display:inline-flex; align-items:center; gap:6px; margin-top:10px;">
+              View Details ${iconArrow}
+            </span>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    window.searchListings = function() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      if (!q) { renderListings(allListings); return; }
+      const results = allListings.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.location.toLowerCase().includes(q)
+      );
+      renderListings(results);
+    };
+
+    document.getElementById('searchInput').addEventListener('input', window.searchListings);
+    document.getElementById('searchInput').addEventListener('keyup', e => {
+      if (e.key === 'Enter') window.searchListings();
+    });
+
+    document.getElementById('hamburgerBtn').addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('active');
+    });
+
+    document.querySelectorAll('.mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobileMenu').classList.remove('active');
+      });
+    });
+
+    loadFirestoreListings();
+  </script>
+
+  <script>
+    function switchHow(tab, btn) {
+      document.querySelectorAll('.how-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('guestSteps').style.display = tab === 'guest' ? 'flex' : 'none';
+      document.getElementById('hostSteps').style.display = tab === 'host' ? 'flex' : 'none';
+    }
+
+    window.addEventListener('load', () => {
+      const defaultTab = document.querySelector('.how-tab.active');
+      if (defaultTab) {
+        switchHow('guest', defaultTab);
+      }
+    });
+  </script>
 </body>
 </html>

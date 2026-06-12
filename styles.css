@@ -273,3 +273,166 @@ footer {
     flex-direction: column;
   }
 }
+/* How it Works */
+.how-it-works {
+  padding: 80px 5%;
+  background: #f8fafc;
+}
+
+.how-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.how-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.how-tab {
+  padding: 12px 28px;
+  border: none;
+  background: white;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.how-tab.active {
+  background: var(--primary);
+  color: white;
+}
+
+.how-steps {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.how-step {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  max-width: 320px;
+  text-align: center;
+  flex: 1;
+  min-width: 280px;
+}
+
+.step-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.how-cta {
+  text-align: center;
+  margin-top: 50px;
+}
+
+@media (max-width: 768px) {
+  .how-steps {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* Beautiful Navbar */
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.1rem 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.logo img {
+  transition: transform 0.3s;
+}
+
+.logo:hover img {
+  transform: scale(1.08);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.8rem;
+  align-items: center;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--dark);
+  font-weight: 500;
+  position: relative;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: var(--primary);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background: var(--primary);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  padding: 1.5rem 5%;
+  flex-direction: column;
+  gap: 1.4rem;
+  z-index: 999;
+}
+
+.mobile-menu.active {
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .nav-links, .nav-auth {
+    display: none;
+  }
+  .hamburger {
+    display: block;
+  }
+}
