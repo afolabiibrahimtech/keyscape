@@ -160,6 +160,7 @@
       <div class="nav-auth">
         <span id="navUser" style="color:#666; font-size:0.9rem; margin-right:4px;"></span>
         <a href="my-listings.html" id="myListingsLink" style="display:none;" class="nav-link">My Listings</a>
+        <a href="bookings.html" id="bookingsLink" style="display:none;" class="nav-link">Bookings</a>
         <a href="profile.html" id="profileLink" style="display:none;" class="nav-link">My Profile</a>
         <a href="#" id="logoutBtn" style="display:none; color:#ef4444;" class="nav-link">Logout</a>
       </div>
@@ -178,6 +179,7 @@
       <a href="list.html" class="nav-link">List Your Property</a>
       <a href="index.html#how" class="nav-link">How it Works</a>
       <a href="my-listings.html" id="mobileMyListingsLink" style="display:none;" class="nav-link">My Listings</a>
+      <a href="bookings.html" id="mobileBookingsLink" style="display:none;" class="nav-link">Bookings</a>
       <a href="profile.html" id="mobileProfileLink" style="display:none;" class="nav-link">My Profile</a>
       <a href="#" id="mobileLogoutBtn" style="display:none; color:#ef4444;" class="nav-link">Logout</a>
     </div>
@@ -463,6 +465,8 @@
       document.getElementById('navUser').textContent = hostProfile.name;
       document.getElementById('myListingsLink').style.display = 'inline';
       document.getElementById('mobileMyListingsLink').style.display = 'block';
+      document.getElementById('bookingsLink').style.display = 'inline';
+      document.getElementById('mobileBookingsLink').style.display = 'block';
       document.getElementById('profileLink').style.display = 'inline';
       document.getElementById('mobileProfileLink').style.display = 'block';
       document.getElementById('logoutBtn').style.display = 'inline';

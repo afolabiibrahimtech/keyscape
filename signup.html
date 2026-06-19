@@ -150,7 +150,8 @@
           languages: '',
           hostingSince: '',
           createdAt: new Date().toISOString(),
-          profileComplete: false
+          profileComplete: false,
+          role: 'host'
         });
       }
     }
@@ -196,6 +197,16 @@
         const provider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, provider);
         await createHostProfile(result.user, result.user.displayName);
+
+        // Check if this account already has a password set (returning Google user who set one before)
+        const hasPassword = result.user.providerData.some(p => p.providerId === 'password');
+
+        if (!hasPassword) {
+          // New Google sign-up, or hasn't set a password yet — require it before continuing
+          window.location.href = 'set-password.html';
+          return;
+        }
+
         const snap = await getDoc(doc(db, 'hosts', result.user.uid));
         if (snap.exists() && snap.data().profileComplete) {
           window.location.href = 'list.html';

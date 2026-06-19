@@ -167,7 +167,9 @@
         const result = await signInWithPopup(auth, provider);
         const ref = doc(db, 'hosts', result.user.uid);
         const snap = await getDoc(ref);
-        if (!snap.exists()) {
+        const isNewHost = !snap.exists();
+
+        if (isNewHost) {
           await setDoc(ref, {
             uid: result.user.uid,
             name: result.user.displayName || '',
@@ -178,8 +180,19 @@
             languages: '',
             hostingSince: '',
             createdAt: new Date().toISOString(),
-            profileComplete: false
+            profileComplete: false,
+            role: 'host'
           });
+        }
+
+        // Require a password to be set if this account doesn't have one yet
+        const hasPassword = result.user.providerData.some(p => p.providerId === 'password');
+        if (!hasPassword) {
+          window.location.href = 'set-password.html';
+          return;
+        }
+
+        if (isNewHost) {
           window.location.href = 'profile.html?setup=true';
         } else if (snap.data().profileComplete) {
           window.location.href = 'list.html';
