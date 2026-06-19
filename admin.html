@@ -86,9 +86,10 @@
         Admin
       </h1>
       <p>Keyscape Homes Dashboard</p>
-      <input type="password" id="passwordInput" placeholder="Enter password" onkeyup="if(event.key==='Enter') login()">
-      <button class="login-btn" onclick="login()">Login</button>
-      <p class="login-error" id="loginError">Incorrect password. Try again.</p>
+      <input type="email" id="emailInput" placeholder="Admin email" autocomplete="username" style="letter-spacing:normal; text-align:left;">
+      <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password" onkeyup="if(event.key==='Enter') login()" style="letter-spacing:normal; text-align:left;">
+      <button class="login-btn" id="loginBtn" onclick="login()">Login</button>
+      <p class="login-error" id="loginError">Incorrect email or password, or this account does not have admin access.</p>
     </div>
   </div>
 
@@ -117,7 +118,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD34KXZcVyxnqN_wuP5GShI8uNbe6osXVQ",
@@ -131,9 +133,9 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const ADMIN_PASSWORD = 'keyscape2026'; // ⚠️ Change this!
     let currentTab = 'pending';
     let allListings = [];
 
@@ -186,21 +188,65 @@
       return `data:image/svg+xml;base64,${btoa(svg)}`;
     }
 
-    window.login = function() {
-      if (document.getElementById('passwordInput').value === ADMIN_PASSWORD) {
+    window.login = async function() {
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const btn = document.getElementById('loginBtn');
+      const errorEl = document.getElementById('loginError');
+      errorEl.style.display = 'none';
+
+      if (!email || !password) {
+        errorEl.textContent = 'Please enter your email and password.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      btn.textContent = 'Logging in...';
+      btn.disabled = true;
+
+      try {
+        const result = await signInWithEmailAndPassword(auth, email, password);
+        const snap = await getDoc(doc(db, 'hosts', result.user.uid));
+
+        if (!snap.exists() || snap.data().role !== 'admin') {
+          await signOut(auth);
+          errorEl.textContent = 'This account does not have admin access.';
+          errorEl.style.display = 'block';
+          btn.textContent = 'Login';
+          btn.disabled = false;
+          return;
+        }
+
+        // Role confirmed — show dashboard
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('adminPage').style.display = 'block';
         loadListings();
-      } else {
-        document.getElementById('loginError').style.display = 'block';
-        document.getElementById('passwordInput').value = '';
+      } catch (e) {
+        errorEl.textContent = 'Incorrect email or password.';
+        errorEl.style.display = 'block';
+        btn.textContent = 'Login';
+        btn.disabled = false;
       }
     };
 
-    window.logout = function() {
+    window.logout = async function() {
+      await signOut(auth);
       document.getElementById('loginScreen').style.display = 'flex';
       document.getElementById('adminPage').style.display = 'none';
+      document.getElementById('emailInput').value = '';
+      document.getElementById('passwordInput').value = '';
     };
+
+    // If already signed in (page refresh) and has admin role, skip straight to dashboard
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      const snap = await getDoc(doc(db, 'hosts', user.uid));
+      if (snap.exists() && snap.data().role === 'admin') {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminPage').style.display = 'block';
+        loadListings();
+      }
+    });
 
     async function loadListings() {
       const snap = await getDocs(collection(db, 'listings'));
