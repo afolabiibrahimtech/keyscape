@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="logo/favicon.jpg">
   <title>Manage Availability | Keyscape Homes</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -10,21 +11,20 @@
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: var(--dark); line-height: 1.6; }
 
     /* ==================== NAV ==================== */
-    nav { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-    .nav-container { max-width: 1400px; margin: 0 auto; padding: 1.1rem 5%; display: flex; justify-content: space-between; align-items: center; }
+    nav { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+    .nav-container { max-width: 1400px; margin: 0 auto; padding: 1.1rem 5%; display: flex; justify-content: space-between; align-items: center; position: relative; }
     .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.6rem; color: var(--primary); text-decoration: none; }
     .logo:hover img { transform: scale(1.08); }
     .logo img { transition: transform 0.3s; }
-    .nav-links { display: flex; gap: 2.8rem; align-items: center; }
-    .nav-link { text-decoration: none; color: var(--dark); font-weight: 500; position: relative; transition: color 0.3s; }
+    .nav-link { text-decoration: none; color: var(--dark); font-weight: 500; }
     .nav-link:hover { color: var(--primary); }
-    .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 0; background: var(--primary); transition: width 0.3s ease; }
-    .nav-link:hover::after { width: 100%; }
-    .nav-auth { display: flex; align-items: center; gap: 1.2rem; }
-    .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
-    .mobile-menu { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 1.5rem 5%; flex-direction: column; gap: 1.4rem; z-index: 999; }
+    .hamburger { display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; padding: 8px; color: var(--primary); }
+    .mobile-menu { display: none; position: absolute; top: 100%; right: 0; width: 50%; min-width: 240px; max-width: 340px; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.15); padding: 1.2rem 1.5rem; flex-direction: column; gap: 1.1rem; z-index: 999; border-radius: 0 0 0 14px; }
     .mobile-menu.active { display: flex; }
-    @media (max-width: 768px) { .nav-links, .nav-auth { display: none; } .hamburger { display: block; } }
+    .mobile-menu .nav-link { font-size: 0.98rem; padding: 4px 0; display: block; }
+    .menu-divider { border: none; border-top: 1px solid #e2e8f0; margin: 2px 0; }
+    .menu-user { color: #666; font-size: 0.85rem; font-weight: 600; padding-bottom: 2px; display: block; }
+    @media (max-width: 480px) { .mobile-menu { width: 70%; min-width: 0; } }
 
     /* ==================== PAGE ==================== */
     .page { max-width: 700px; margin: 0 auto; padding: 2rem 5%; }
@@ -52,6 +52,7 @@
     .legend-swatch { width: 16px; height: 16px; border-radius: 4px; }
     .legend-swatch.available { background: #f8fafc; border: 2px solid #e2e8f0; }
     .legend-swatch.blocked { background: #fee2e2; }
+    .legend-swatch.booked-locked { background: #ede9fe; }
     .legend-swatch.past { background: #f1f5f9; }
 
     .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
@@ -76,6 +77,7 @@
     .calendar-day.past { color: #cbd5e1; background: #f1f5f9; cursor: not-allowed; border-color: #f1f5f9; }
     .calendar-day:not(.header):not(.empty):not(.past):hover { border-color: var(--primary); }
     .calendar-day.blocked { background: #fee2e2; border-color: #fca5a5; color: #991b1b; font-weight: 600; }
+    .calendar-day.booked-locked { background: #ede9fe; border-color: #c4b5fd; color: #5b21b6; font-weight: 600; cursor: not-allowed; }
 
     .save-status {
       display: none; align-items: center; gap: 8px; margin-top: 1.2rem;
@@ -102,32 +104,22 @@
       <a href="index.html" class="logo">
         <img src="logo/keyscape-logo.png" alt="KeyScape Logo" height="42">
       </a>
-      <div class="nav-links">
-        <a href="index.html#listings" class="nav-link">Browse Homes</a>
-        <a href="list.html" class="nav-link">List Your Property</a>
-        <a href="index.html#how" class="nav-link">How it Works</a>
-      </div>
-      <div class="nav-auth">
-        <span id="navUser" style="color:#666; font-size:0.9rem;"></span>
-        <a href="my-listings.html" class="nav-link">My Listings</a>
-        <a href="bookings.html" class="nav-link">Bookings</a>
-        <a href="profile.html" class="nav-link">My Profile</a>
-        <a href="#" id="logoutBtn" style="color:#ef4444;" class="nav-link">Logout</a>
-      </div>
       <button class="hamburger" id="hamburgerBtn">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
       </button>
-    </div>
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="index.html#listings" class="nav-link">Browse Homes</a>
-      <a href="list.html" class="nav-link">List Your Property</a>
-      <a href="index.html#how" class="nav-link">How it Works</a>
-      <a href="my-listings.html" class="nav-link">My Listings</a>
-      <a href="bookings.html" class="nav-link">Bookings</a>
-      <a href="profile.html" class="nav-link">My Profile</a>
-      <a href="#" id="mobileLogoutBtn" style="color:#ef4444;" class="nav-link">Logout</a>
+      <div class="mobile-menu" id="mobileMenu">
+        <span id="navUser" class="menu-user"></span>
+        <a href="index.html#listings" class="nav-link">Browse Homes</a>
+        <a href="list.html" class="nav-link">List Your Property</a>
+        <a href="index.html#how" class="nav-link">How it Works</a>
+        <hr class="menu-divider">
+        <a href="my-listings.html" class="nav-link">My Listings</a>
+        <a href="bookings.html" class="nav-link">Bookings</a>
+        <a href="profile.html" class="nav-link">My Profile</a>
+        <a href="#" id="logoutBtn" style="color:#ef4444;" class="nav-link">Logout</a>
+      </div>
     </div>
   </nav>
 
@@ -159,7 +151,8 @@
       <div class="calendar-card">
         <div class="legend">
           <div class="legend-item"><div class="legend-swatch available"></div> Available</div>
-          <div class="legend-item"><div class="legend-swatch blocked"></div> Blocked</div>
+          <div class="legend-item"><div class="legend-swatch blocked"></div> Blocked by you</div>
+          <div class="legend-item"><div class="legend-swatch booked-locked"></div> Booked by guest</div>
           <div class="legend-item"><div class="legend-swatch past"></div> Past date</div>
         </div>
 
@@ -185,7 +178,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD34KXZcVyxnqN_wuP5GShI8uNbe6osXVQ",
@@ -210,6 +203,7 @@
 
     let listingData = null;
     let blockedDates = new Set();
+    let bookedDates = new Set(); // dates from confirmed bookings — locked, can't be manually toggled
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
     let saveTimeout = null;
@@ -228,9 +222,6 @@
       document.getElementById('logoutBtn').addEventListener('click', async (e) => {
         e.preventDefault(); await signOut(auth); window.location.href = 'index.html';
       });
-      document.getElementById('mobileLogoutBtn').addEventListener('click', async (e) => {
-        e.preventDefault(); await signOut(auth); window.location.href = 'index.html';
-      });
 
       if (!propertyId) {
         window.location.href = 'my-listings.html';
@@ -247,6 +238,23 @@
       listingData = snap.data();
       blockedDates = new Set(listingData.blockedDates || []);
 
+      // Load confirmed bookings for this property so guest-booked dates show as locked,
+      // distinct from dates the host has manually blocked
+      try {
+        const bq = query(
+          collection(db, 'bookings'),
+          where('propertyId', '==', propertyId),
+          where('status', '==', 'confirmed')
+        );
+        const bSnap = await getDocs(bq);
+        bSnap.docs.forEach(bDoc => {
+          const b = bDoc.data();
+          getDateRange(b.checkInDate, b.checkOutDate).forEach(d => bookedDates.add(d));
+        });
+      } catch (e) {
+        console.error('Could not load confirmed bookings:', e);
+      }
+
       document.getElementById('propImage').src = listingData.image || '';
       document.getElementById('propName').textContent = listingData.name;
       document.getElementById('propLocation').textContent = listingData.location;
@@ -256,6 +264,18 @@
 
       initCalendar();
     });
+
+    // Returns array of YYYY-MM-DD strings for every night of a stay (check-in inclusive, check-out exclusive)
+    function getDateRange(checkInStr, checkOutStr) {
+      const dates = [];
+      const cursor = new Date(checkInStr);
+      const end = new Date(checkOutStr);
+      while (cursor < end) {
+        dates.push(`${cursor.getFullYear()}-${String(cursor.getMonth()+1).padStart(2,'0')}-${String(cursor.getDate()).padStart(2,'0')}`);
+        cursor.setDate(cursor.getDate() + 1);
+      }
+      return dates;
+    }
 
     function initCalendar() {
       generateCalendar();
@@ -302,6 +322,10 @@
 
         if (thisDate < today) {
           dayEl.className = 'calendar-day past';
+        } else if (bookedDates.has(dateStr)) {
+          // Guest has a confirmed booking on this date — locked, cannot be toggled by host
+          dayEl.className = 'calendar-day booked-locked';
+          dayEl.title = 'Booked by a guest';
         } else {
           dayEl.className = 'calendar-day' + (blockedDates.has(dateStr) ? ' blocked' : '');
           dayEl.addEventListener('click', () => toggleDate(dateStr, dayEl));

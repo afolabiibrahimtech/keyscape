@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="logo/favicon.jpg">
   <title>Keyscape Homes - Premium Shortlets in Lagos</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -10,23 +11,9 @@
     <!-- Navigation -->
   <nav>
     <div class="nav-container">
-      <div class="logo">
+      <a href="#home" class="logo">
         <img src="logo/keyscape-logo.png" alt="KeyScape Logo" height="42">
-      </div>
-      
-      <div class="nav-links">
-        <a href="#listings" class="nav-link">Browse Homes</a>
-        <a href="list.html" class="nav-link">List Your Property</a>
-        <a href="#how" class="nav-link">How it Works</a>
-      </div>
-
-      <div class="nav-auth">
-        <a href="login.html" id="navLoginBtn" class="nav-link">Log In</a>
-        <span id="navUserName" style="display:none; color:#0f4c3a; font-weight:600; margin-right:12px;"></span>
-        <a href="my-listings.html" id="navMyListingsBtn" style="display:none;" class="nav-link">My Listings</a>
-        <a href="profile.html" id="navProfileBtn" style="display:none;" class="nav-link">My Profile</a>
-        <a href="#" id="navLogoutBtn" style="display:none; color:#ef4444;" class="nav-link">Logout</a>
-      </div>
+      </a>
 
       <button class="hamburger" id="hamburgerBtn">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -35,17 +22,20 @@
           <line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
       </button>
-    </div>
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="#listings" class="nav-link">Browse Homes</a>
-      <a href="list.html" class="nav-link">List Your Property</a>
-      <a href="#how" class="nav-link">How it Works</a>
-      <a href="login.html" id="mobileLoginBtn" class="nav-link">Log In</a>
-      <a href="my-listings.html" id="mobileMyListingsBtn" style="display:none;" class="nav-link">My Listings</a>
-      <a href="profile.html" id="mobileProfileBtn" style="display:none;" class="nav-link">My Profile</a>
-      <a href="#" id="mobileLogoutBtn" style="display:none; color:#ef4444;" class="nav-link">Logout</a>
+      <!-- Dropdown Menu -->
+      <div class="mobile-menu" id="mobileMenu">
+        <span id="navUserName" style="display:none;" class="menu-user"></span>
+        <a href="#listings" class="nav-link">Browse Homes</a>
+        <a href="list.html" class="nav-link">List Your Property</a>
+        <a href="#how" class="nav-link">How it Works</a>
+        <hr class="menu-divider">
+        <a href="login.html" id="mobileLoginBtn" class="nav-link">Log In</a>
+        <a href="my-listings.html" id="navMyListingsBtn" style="display:none;" class="nav-link">My Listings</a>
+        <a href="bookings.html" id="navBookingsBtn" style="display:none;" class="nav-link">Bookings</a>
+        <a href="profile.html" id="navProfileBtn" style="display:none;" class="nav-link">My Profile</a>
+        <a href="#" id="navLogoutBtn" style="display:none; color:#ef4444;" class="nav-link">Logout</a>
+      </div>
     </div>
   </nav>
 
@@ -192,7 +182,10 @@
         </div>
       </div>
 
-      
+      <div class="how-cta">
+        <a href="#listings" class="btn btn-primary">Browse Homes</a>
+        <a href="list.html" class="btn btn-outline">List Your Property</a>
+      </div>
     </div>
   </section>
 
@@ -228,36 +221,24 @@
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        document.getElementById('navLoginBtn').style.display = 'none';
-        document.getElementById('navUserName').style.display = 'inline';
-        document.getElementById('navUserName').textContent = user.displayName || user.email;
-        document.getElementById('navMyListingsBtn').style.display = 'inline';
-        document.getElementById('navProfileBtn').style.display = 'inline';
-        document.getElementById('navLogoutBtn').style.display = 'inline';
         document.getElementById('mobileLoginBtn').style.display = 'none';
-        document.getElementById('mobileMyListingsBtn').style.display = 'block';
-        document.getElementById('mobileProfileBtn').style.display = 'block';
-        document.getElementById('mobileLogoutBtn').style.display = 'block';
+        document.getElementById('navUserName').style.display = 'block';
+        document.getElementById('navUserName').textContent = user.displayName || user.email;
+        document.getElementById('navMyListingsBtn').style.display = 'block';
+        document.getElementById('navBookingsBtn').style.display = 'block';
+        document.getElementById('navProfileBtn').style.display = 'block';
+        document.getElementById('navLogoutBtn').style.display = 'block';
       } else {
-        document.getElementById('navLoginBtn').style.display = 'inline';
+        document.getElementById('mobileLoginBtn').style.display = 'block';
         document.getElementById('navUserName').style.display = 'none';
         document.getElementById('navMyListingsBtn').style.display = 'none';
+        document.getElementById('navBookingsBtn').style.display = 'none';
         document.getElementById('navProfileBtn').style.display = 'none';
         document.getElementById('navLogoutBtn').style.display = 'none';
-        document.getElementById('mobileLoginBtn').style.display = 'block';
-        document.getElementById('mobileMyListingsBtn').style.display = 'none';
-        document.getElementById('mobileProfileBtn').style.display = 'none';
-        document.getElementById('mobileLogoutBtn').style.display = 'none';
       }
     });
 
     document.getElementById('navLogoutBtn').addEventListener('click', async (e) => {
-      e.preventDefault();
-      await signOut(auth);
-      window.location.reload();
-    });
-
-    document.getElementById('mobileLogoutBtn').addEventListener('click', async (e) => {
       e.preventDefault();
       await signOut(auth);
       window.location.reload();

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="logo/favicon.jpg">
+  <title>Reset Password | Keyscape Homes</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --primary: #0f4c3a; --accent: #1a8c6b; --light: #f8fafc; --dark: #111827; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .auth-page {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #0f4c3a 0%, #1a8c6b 100%); padding: 2rem;
+    }
+    .auth-card { background: white; border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 440px; box-shadow: 0 25px 60px rgba(0,0,0,0.25); }
+    .auth-logo { text-align: center; margin-bottom: 1.5rem; }
+    .auth-logo a { text-decoration: none; }
+    .auth-logo h1 { color: var(--primary); font-size: 1.8rem; transition: opacity 0.2s; }
+    .auth-logo a:hover h1 { opacity: 0.75; }
+    .auth-logo p { color: #666; font-size: 0.95rem; margin-top: 4px; }
+    .form-group { margin-bottom: 1.1rem; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; color: var(--dark); }
+    .form-group input { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+    .form-group input:focus { border-color: var(--primary); }
+    .auth-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 0.5rem; touch-action: manipulation; }
+    .auth-btn:hover { background: var(--accent); transform: translateY(-2px); }
+    .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .auth-footer { text-align: center; margin-top: 1.5rem; color: #666; font-size: 0.9rem; }
+    .auth-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
+    .error-msg { background: #fee2e2; color: #991b1b; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 1rem; display: none; }
+    .success-msg { background: #d1fae5; color: #065f46; padding: 14px 16px; border-radius: 10px; font-size: 0.9rem; margin-bottom: 1rem; display: none; line-height: 1.5; }
+    .info-msg {
+      display: flex; gap: 10px; align-items: flex-start;
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;
+      padding: 12px 14px; margin-bottom: 1.2rem; font-size: 0.85rem; color: var(--primary); line-height: 1.5;
+    }
+    .info-msg svg { flex-shrink: 0; margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <a href="index.html"><h1>Keyscape Homes</h1></a>
+        <p>Reset your password</p>
+      </div>
+
+      <div class="info-msg">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>Enter the email address on your Keyscape account and we'll send you a link to reset your password.</span>
+      </div>
+
+      <div class="error-msg" id="errorMsg"></div>
+      <div class="success-msg" id="successMsg"></div>
+
+      <div id="formView">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="emailInput" placeholder="you@email.com" onkeyup="if(event.key==='Enter') sendReset()">
+        </div>
+        <button class="auth-btn" id="resetBtn" onclick="sendReset()">Send Reset Link</button>
+      </div>
+
+      <div class="auth-footer">
+        <a href="login.html">← Back to Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD34KXZcVyxnqN_wuP5GShI8uNbe6osXVQ",
+      authDomain: "keyscapeltd.org",
+      databaseURL: "https://keyscape-homes-default-rtdb.firebaseio.com",
+      projectId: "keyscape-homes",
+      storageBucket: "keyscape-homes.firebasestorage.app",
+      messagingSenderId: "8066332433",
+      appId: "1:8066332433:web:571a5335e2796d3845feb0",
+      measurementId: "G-F9CP7R9BH5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.sendReset = async function() {
+      const email = document.getElementById('emailInput').value.trim();
+      const errorEl = document.getElementById('errorMsg');
+      const successEl = document.getElementById('successMsg');
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
+
+      if (!email) {
+        errorEl.textContent = 'Please enter your email address.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      const btn = document.getElementById('resetBtn');
+      btn.disabled = true;
+      btn.textContent = 'Checking...';
+
+      try {
+        // Check if this email exists in our hosts collection first
+        const q = query(collection(db, 'hosts'), where('email', '==', email.toLowerCase()));
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+          btn.disabled = false;
+          btn.textContent = 'Send Reset Link';
+          errorEl.innerHTML = `No account found for <strong>${email}</strong>. <a href="signup.html" style="color:#991b1b; font-weight:600;">Sign up instead?</a>`;
+          errorEl.style.display = 'block';
+          return;
+        }
+
+        // Email exists — send the reset link
+        btn.textContent = 'Sending...';
+        await sendPasswordResetEmail(auth, email);
+        document.getElementById('formView').style.display = 'none';
+        successEl.innerHTML = `
+          <strong>Reset link sent!</strong><br>
+          Check your inbox at <strong>${email}</strong> for a link to reset your password.
+          If you don't see it within a few minutes, check your spam folder.
+        `;
+        successEl.style.display = 'block';
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = 'Send Reset Link';
+        if (e.code === 'auth/invalid-email') {
+          errorEl.textContent = 'Please enter a valid email address.';
+        } else {
+          errorEl.textContent = 'Something went wrong. Please try again.';
+        }
+        errorEl.style.display = 'block';
+      }
+    };
+  </script>
+</body>
+</html>

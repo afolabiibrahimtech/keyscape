@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="logo/favicon.jpg">
   <title>Property | Keyscape Homes</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -215,6 +216,7 @@
       display: inline-block; padding: 14px 28px; border-radius: 12px; text-decoration: none;
       font-weight: 600; margin-top: 1rem; transition: all 0.3s; width: 100%;
       text-align: center; cursor: pointer; border: none; font-size: 1rem;
+      touch-action: manipulation;
     }
     .btn-primary { background: var(--primary); color: white; }
     .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
@@ -335,6 +337,7 @@
         <h2 id="propPrice"></h2>
         <p id="propStayInfo"></p>
         <button id="openBooking" class="btn btn-primary">Check Availability & Book Now</button>
+        <p id="ownListingNotice" style="display:none; color:#94a3b8; font-size:0.85rem; margin-top:10px;">This is your own listing, so booking is disabled. <a href="manage-calendar.html" id="ownListingCalendarLink" style="color:var(--primary); font-weight:600;">Manage availability instead</a>.</p>
       </div>
     </div>
 
@@ -396,6 +399,17 @@
         <p><strong>Check-out:</strong> <span id="selectedCheckOut">Not selected</span></p>
         <p><strong>Total:</strong> <span id="totalPrice">₦0</span> (<span id="nightsCount">0 nights</span>)</p>
       </div>
+      <div class="guest-fields" id="guestFields" style="display:none;">
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:0.85rem; margin-bottom:6px; color:rgba(255,255,255,0.85);">Your Name</label>
+          <input type="text" id="guestName" placeholder="Full name" style="width:100%; padding:10px 14px; border-radius:8px; border:none; font-size:0.95rem;">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:0.85rem; margin-bottom:6px; color:rgba(255,255,255,0.85);">Your Phone / WhatsApp</label>
+          <input type="tel" id="guestPhone" placeholder="e.g. 08012345678" style="width:100%; padding:10px 14px; border-radius:8px; border:none; font-size:0.95rem;">
+        </div>
+        <p id="bookingError" style="display:none; color:#fca5a5; font-size:0.85rem; margin-bottom:8px;"></p>
+      </div>
       <button id="confirmBooking" class="btn btn-primary">Confirm Booking</button>
     </div>
   </div>
@@ -421,7 +435,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD34KXZcVyxnqN_wuP5GShI8uNbe6osXVQ",
@@ -435,7 +450,14 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
+
+    let currentUserUid = null;
+    onAuthStateChanged(auth, (user) => {
+      currentUserUid = user ? user.uid : null;
+      updateBookingButtonState();
+    });
 
     document.getElementById('hamburgerBtn').addEventListener('click', () => {
       document.getElementById('mobileMenu').classList.toggle('active');
@@ -545,7 +567,7 @@
         const snap = await getDoc(doc(db, 'listings', propertyId));
         if (!snap.exists() || snap.data().status !== 'approved') { showNotFound(); return; }
         propertyData = snap.data();
-        renderProperty();
+        await renderProperty();
       } catch (e) {
         console.error(e);
         showNotFound();
@@ -557,7 +579,7 @@
       document.getElementById('notFoundPage').style.display = 'flex';
     }
 
-    function renderProperty() {
+    async function renderProperty() {
       const p = propertyData;
       document.title = `${p.name} | Keyscape Homes`;
 
@@ -606,19 +628,8 @@
         document.getElementById('propDescription').textContent = p.description;
       }
 
-      // Host
-      document.getElementById('hostName').textContent = p.hostName || 'Host';
-      document.getElementById('hostImage').src = p.hostPhoto || avatarPlaceholder(p.hostName, 120);
-      document.getElementById('hostBio').textContent = p.hostBio || '';
-
-      const hostMeta = [];
-      if (p.hostingSince) hostMeta.push(`<div class="stat">${iconCalendar} Hosting since <strong>${p.hostingSince}</strong></div>`);
-      document.getElementById('hostMeta').innerHTML = hostMeta.join('');
-
-      if (p.hostLanguages) {
-        document.getElementById('hostLanguagesText').style.display = 'block';
-        document.getElementById('hostLanguages').textContent = p.hostLanguages;
-      }
+      // Host — fetch live data from hosts/{hostUid} so reassigned/updated host info is always current
+      await renderHost(p);
 
       // House Rules
       if (p.houseRules && p.houseRules.length) {
@@ -637,6 +648,64 @@
 
       initGallery();
       initCalendar();
+      updateBookingButtonState();
+    }
+
+    // Disable booking if the logged-in visitor owns this listing
+    function updateBookingButtonState() {
+      if (!propertyData) return; // property not loaded yet
+      const isOwnListing = currentUserUid && propertyData.hostUid && currentUserUid === propertyData.hostUid;
+
+      const bookBtn = document.getElementById('openBooking');
+      const notice = document.getElementById('ownListingNotice');
+      if (!bookBtn || !notice) return;
+
+      if (isOwnListing) {
+        bookBtn.disabled = true;
+        bookBtn.style.opacity = '0.5';
+        bookBtn.style.cursor = 'not-allowed';
+        notice.style.display = 'block';
+        document.getElementById('ownListingCalendarLink').href = `manage-calendar.html?id=${propertyId}`;
+      } else {
+        bookBtn.disabled = false;
+        bookBtn.style.opacity = '';
+        bookBtn.style.cursor = '';
+        notice.style.display = 'none';
+      }
+    }
+
+    // Fetch live host data from hosts/{hostUid}, falling back to listing snapshot fields
+    // if the host doc can't be found (e.g. deleted account, missing hostUid)
+    async function renderHost(p) {
+      let host = null;
+
+      if (p.hostUid) {
+        try {
+          const hostSnap = await getDoc(doc(db, 'hosts', p.hostUid));
+          if (hostSnap.exists()) host = hostSnap.data();
+        } catch (e) {
+          console.error('Could not load live host data:', e);
+        }
+      }
+
+      const name = host?.name || p.hostName || 'Host';
+      const photo = host?.photo || p.hostPhoto || '';
+      const bio = host?.bio || p.hostBio || '';
+      const languages = host?.languages || p.hostLanguages || '';
+      const hostingSince = host?.hostingSince || p.hostingSince || '';
+
+      document.getElementById('hostName').textContent = name;
+      document.getElementById('hostImage').src = photo || avatarPlaceholder(name, 120);
+      document.getElementById('hostBio').textContent = bio;
+
+      const hostMeta = [];
+      if (hostingSince) hostMeta.push(`<div class="stat">${iconCalendar} Hosting since <strong>${hostingSince}</strong></div>`);
+      document.getElementById('hostMeta').innerHTML = hostMeta.join('');
+
+      if (languages) {
+        document.getElementById('hostLanguagesText').style.display = 'block';
+        document.getElementById('hostLanguages').textContent = languages;
+      }
     }
 
     // ===== Gallery =====
@@ -686,20 +755,40 @@
         generateCalendar();
       });
       document.getElementById('openBooking').onclick = () => {
+        if (currentUserUid && propertyData.hostUid && currentUserUid === propertyData.hostUid) {
+          alert("You can't book your own listing.");
+          return;
+        }
         document.getElementById('bookingModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
         generateCalendar();
       };
-      document.getElementById('closeBooking').onclick = () => document.getElementById('bookingModal').style.display = 'none';
-      document.getElementById('modalBackBtn').onclick = () => document.getElementById('amenitiesModal').style.display = 'none';
+      document.getElementById('closeBooking').onclick = () => {
+        document.getElementById('bookingModal').style.display = 'none';
+        document.body.style.overflow = '';
+      };
+      document.getElementById('modalBackBtn').onclick = () => {
+        document.getElementById('amenitiesModal').style.display = 'none';
+        document.body.style.overflow = '';
+      };
 
       const showAllBtn = document.getElementById('showAllAmenities');
-      if (showAllBtn) showAllBtn.onclick = () => document.getElementById('amenitiesModal').style.display = 'flex';
+      if (showAllBtn) showAllBtn.onclick = () => {
+        document.getElementById('amenitiesModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      };
 
       document.getElementById('confirmBooking').addEventListener('click', handleConfirmBooking);
 
       window.onclick = (e) => {
-        if (e.target.id === 'bookingModal') document.getElementById('bookingModal').style.display = 'none';
-        if (e.target.id === 'amenitiesModal') document.getElementById('amenitiesModal').style.display = 'none';
+        if (e.target.id === 'bookingModal') {
+          document.getElementById('bookingModal').style.display = 'none';
+          document.body.style.overflow = '';
+        }
+        if (e.target.id === 'amenitiesModal') {
+          document.getElementById('amenitiesModal').style.display = 'none';
+          document.body.style.overflow = '';
+        }
       };
     }
 
@@ -754,8 +843,14 @@
         checkInDate = dateStr;
         document.getElementById('selectedCheckIn').textContent = new Date(dateStr).toLocaleDateString('en-GB');
       } else if (!checkOutDate) {
-        checkOutDate = dateStr;
-        document.getElementById('selectedCheckOut').textContent = new Date(dateStr).toLocaleDateString('en-GB');
+        if (new Date(dateStr) <= new Date(checkInDate)) {
+          // Clicked a date on/before the current check-in — restart with this as the new check-in
+          checkInDate = dateStr;
+          document.getElementById('selectedCheckIn').textContent = new Date(dateStr).toLocaleDateString('en-GB');
+        } else {
+          checkOutDate = dateStr;
+          document.getElementById('selectedCheckOut').textContent = new Date(dateStr).toLocaleDateString('en-GB');
+        }
       } else {
         checkInDate = dateStr;
         checkOutDate = null;
@@ -792,11 +887,22 @@
         if (nights > 0) {
           document.getElementById('nightsCount').textContent = `${nights} nights`;
           document.getElementById('totalPrice').textContent = `₦${(nights * getNightlyRate()).toLocaleString()}`;
+          const guestFields = document.getElementById('guestFields');
+          if (guestFields.style.display !== 'block') {
+            guestFields.style.display = 'block';
+            // Scroll the newly-revealed fields into view so mobile users notice them immediately
+            setTimeout(() => guestFields.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+          }
         }
       }
     }
 
-    function handleConfirmBooking() {
+    async function handleConfirmBooking() {
+      if (currentUserUid && propertyData.hostUid && currentUserUid === propertyData.hostUid) {
+        alert("You can't book your own listing.");
+        return;
+      }
+
       if (!checkInDate || !checkOutDate) {
         alert('Please select both check-in and check-out dates.');
         return;
@@ -811,6 +917,18 @@
         alert(`Minimum stay is ${minStay} night${minStay > 1 ? 's' : ''}.`);
         return;
       }
+
+      const guestName = document.getElementById('guestName').value.trim();
+      const guestPhone = document.getElementById('guestPhone').value.trim();
+      const errorEl = document.getElementById('bookingError');
+
+      if (!guestName || !guestPhone) {
+        errorEl.textContent = 'Please enter your name and phone number to continue.';
+        errorEl.style.display = 'block';
+        document.getElementById('guestFields').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      errorEl.style.display = 'none';
 
       // Check no blocked dates fall within the selected range
       const blocked = propertyData.blockedDates || [];
@@ -828,18 +946,54 @@
       const checkOut = end.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
       const total = (nights * getNightlyRate()).toLocaleString();
 
+      const confirmBtn = document.getElementById('confirmBooking');
+      confirmBtn.textContent = 'Confirming...';
+      confirmBtn.disabled = true;
+
+      let bookingId = null;
+      try {
+        const bookingRef = await addDoc(collection(db, 'bookings'), {
+          propertyId: propertyId,
+          propertyName: propertyData.name,
+          propertyImage: propertyData.image || '',
+          hostUid: propertyData.hostUid || '',
+          hostName: propertyData.hostName || '',
+          hostPhone: propertyData.hostPhone || '',
+          guestName: guestName,
+          guestPhone: guestPhone,
+          checkInDate: checkInDate,
+          checkOutDate: checkOutDate,
+          nights: nights,
+          totalPrice: total,
+          status: 'pending',
+          createdAt: new Date().toISOString()
+        });
+        bookingId = bookingRef.id;
+      } catch (e) {
+        console.error('Failed to create booking record:', e);
+      }
+
+      const checkoutLink = bookingId
+        ? `${window.location.origin}/checkout.html?id=${bookingId}`
+        : '';
+
       const message =
         `Hello Keyscape Homes\n\n` +
         `I'd like to book *${propertyData.name}*.\n\n` +
+        `Name: ${guestName}\n` +
+        `Phone: ${guestPhone}\n` +
         `Check-in: ${checkIn}\n` +
         `Check-out: ${checkOut}\n` +
         `Nights: ${nights}\n` +
         `Total: ₦${total}\n\n` +
-        `Please confirm availability.`;
+        `Please confirm availability.` +
+        (checkoutLink ? `\n\nMy booking reference: ${checkoutLink}` : '');
 
       const phone = normalizePhone(propertyData.hostPhone);
       const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+
+      confirmBtn.textContent = 'Confirm Booking';
+      confirmBtn.disabled = false;
 
       checkInDate = null;
       checkOutDate = null;
@@ -847,7 +1001,16 @@
       document.getElementById('selectedCheckOut').textContent = "Not selected";
       document.getElementById('totalPrice').textContent = "₦0";
       document.getElementById('nightsCount').textContent = "0 nights";
+      document.getElementById('guestFields').style.display = 'none';
+      document.getElementById('guestName').value = '';
+      document.getElementById('guestPhone').value = '';
+      document.getElementById('bookingModal').style.display = 'none';
+      document.body.style.overflow = '';
       generateCalendar();
+
+      // Navigate directly instead of window.open — more reliable on mobile,
+      // since window.open after an async/await gap is often blocked by mobile browsers
+      window.location.href = url;
     }
 
     loadProperty();

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="logo/favicon.jpg">
   <title>Admin | Keyscape Homes</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -131,6 +132,7 @@
       <input type="email" id="emailInput" placeholder="Admin email" autocomplete="username" style="letter-spacing:normal; text-align:left;">
       <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password" onkeyup="if(event.key==='Enter') login()" style="letter-spacing:normal; text-align:left;">
       <button class="login-btn" id="loginBtn" onclick="login()">Login</button>
+      <p style="text-align:right; margin-top:8px; font-size:0.85rem;"><a href="reset.html" style="color:var(--primary); text-decoration:none; font-weight:600;">Forgot password?</a></p>
       <p class="login-error" id="loginError">Incorrect email or password, or this account does not have admin access.</p>
     </div>
   </div>
@@ -144,6 +146,18 @@
       <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
     <div class="admin-body">
+
+      <!-- ===== One-time KYC Migration ===== -->
+      <div id="migrationSection" style="background:white; border-radius:14px; padding:1.2rem 1.5rem; margin-bottom:1.5rem; box-shadow:0 4px 15px rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+        <div>
+          <p style="font-weight:700; color:var(--primary); margin-bottom:3px;">KYC Migration</p>
+          <p style="font-size:0.85rem; color:#666;">Set all existing hosts without a KYC status to <strong>pending</strong> so they go through identity verification.</p>
+        </div>
+        <button id="migrateKycBtn" onclick="migrateKyc()" style="white-space:nowrap; padding:10px 20px; background:var(--primary); color:white; border:none; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.9rem;">
+          Run Migration
+        </button>
+      </div>
+
       <div class="stats-row">
         <div class="stat-card"><div class="num" id="statPending">0</div><div class="label">Pending Review</div></div>
         <div class="stat-card"><div class="num" id="statApproved">0</div><div class="label">Approved</div></div>
@@ -219,7 +233,11 @@
       </div>
       <div class="edit-field">
         <label>Host UID (Firebase Auth UID — reassigns ownership)</label>
-        <input type="text" id="editHostUid">
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="editHostUid" style="flex:1;">
+          <button type="button" id="fetchHostBtn" onclick="fetchHostInfo()" style="white-space:nowrap; padding:10px 14px; border-radius:8px; border:2px solid var(--primary); background:white; color:var(--primary); font-weight:600; font-size:0.85rem; cursor:pointer;">Fetch Info</button>
+        </div>
+        <p id="fetchHostStatus" style="font-size:0.8rem; margin-top:6px; display:none;"></p>
       </div>
 
       <div class="modal-actions">
@@ -232,11 +250,11 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD34KXZcVyxnqN_wuP5GShI8uNbe6osXVQ",
-      authDomain: "keyscape-homes.firebaseapp.com",
+      authDomain: "keyscapeltd.org",
       databaseURL: "https://keyscape-homes-default-rtdb.firebaseio.com",
       projectId: "keyscape-homes",
       storageBucket: "keyscape-homes.firebasestorage.app",
@@ -449,6 +467,7 @@
 
     // ===== Edit Listing Modal =====
     let editingId = null;
+    let editingHostPhoto = '';
 
     window.openEditModal = function(firestoreId) {
       const p = allListings.find(l => l.firestoreId === firestoreId);
@@ -469,8 +488,48 @@
       document.getElementById('editHostEmail').value = p.hostEmail || '';
       document.getElementById('editHostPhone').value = p.hostPhone || '';
       document.getElementById('editHostUid').value = p.hostUid || '';
+      editingHostPhoto = p.hostPhoto || '';
 
       document.getElementById('editModalOverlay').classList.add('active');
+    };
+
+    window.fetchHostInfo = async function() {
+      const uid = document.getElementById('editHostUid').value.trim();
+      const statusEl = document.getElementById('fetchHostStatus');
+      statusEl.style.display = 'block';
+
+      if (!uid) {
+        statusEl.textContent = 'Enter a Host UID first.';
+        statusEl.style.color = '#991b1b';
+        return;
+      }
+
+      const btn = document.getElementById('fetchHostBtn');
+      btn.disabled = true;
+      btn.textContent = 'Fetching...';
+      statusEl.textContent = '';
+
+      try {
+        const snap = await getDoc(doc(db, 'hosts', uid));
+        if (!snap.exists()) {
+          statusEl.textContent = 'No host found with that UID.';
+          statusEl.style.color = '#991b1b';
+        } else {
+          const h = snap.data();
+          document.getElementById('editHostName').value = h.name || '';
+          document.getElementById('editHostEmail').value = h.email || '';
+          document.getElementById('editHostPhone').value = h.phone || '';
+          editingHostPhoto = h.photo || '';
+          statusEl.textContent = `Loaded: ${h.name || 'Unnamed host'} (${h.email || 'no email'})`;
+          statusEl.style.color = '#065f46';
+        }
+      } catch (e) {
+        statusEl.textContent = 'Failed to fetch host info.';
+        statusEl.style.color = '#991b1b';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Fetch Info';
     };
 
     window.closeEditModal = function() {
@@ -496,6 +555,11 @@
       btn.disabled = true;
       btn.textContent = 'Saving...';
 
+      const existingItem = allListings.find(l => l.firestoreId === editingId);
+      const oldHostUid = existingItem ? existingItem.hostUid : null;
+      const newHostUid = document.getElementById('editHostUid').value.trim();
+      const hostUidChanged = newHostUid && oldHostUid && newHostUid !== oldHostUid;
+
       const updates = {
         name: name,
         location: document.getElementById('editLocation').value.trim(),
@@ -507,17 +571,39 @@
         hostName: document.getElementById('editHostName').value.trim(),
         hostEmail: document.getElementById('editHostEmail').value.trim(),
         hostPhone: document.getElementById('editHostPhone').value.trim(),
-        hostUid: document.getElementById('editHostUid').value.trim(),
+        hostPhoto: editingHostPhoto,
+        hostUid: newHostUid,
         editedByAdminAt: new Date().toISOString()
       };
 
       try {
         await updateDoc(doc(db, 'listings', editingId), updates);
 
+        // If the host UID changed, also reassign all bookings for this property
+        // so they show up correctly in the new host's bookings.html dashboard
+        if (hostUidChanged) {
+          const bq = query(collection(db, 'bookings'), where('propertyId', '==', editingId));
+          const bSnap = await getDocs(bq);
+          if (!bSnap.empty) {
+            const batch = writeBatch(db);
+            bSnap.docs.forEach(bDoc => {
+              batch.update(bDoc.ref, {
+                hostUid: newHostUid,
+                hostName: updates.hostName,
+                hostPhone: updates.hostPhone
+              });
+            });
+            await batch.commit();
+          }
+        }
+
         // Update local cache so the dashboard reflects changes immediately
         const item = allListings.find(l => l.firestoreId === editingId);
         if (item) Object.assign(item, updates);
 
+        successEl.textContent = hostUidChanged
+          ? 'Listing updated and bookings reassigned to the new host.'
+          : 'Listing updated successfully.';
         successEl.style.display = 'block';
         btn.disabled = false;
         btn.textContent = 'Save Changes';
@@ -525,7 +611,7 @@
         setTimeout(() => {
           closeEditModal();
           renderDashboard();
-        }, 900);
+        }, 1200);
       } catch (e) {
         errorEl.textContent = 'Failed to save changes. Please try again.';
         errorEl.style.display = 'block';
@@ -534,7 +620,51 @@
       }
     };
 
-    // Close modal on overlay click (not when clicking inside the modal itself)
+    // ===== One-time KYC Migration =====
+    window.migrateKyc = async function() {
+      const btn = document.getElementById('migrateKycBtn');
+      btn.disabled = true;
+      btn.textContent = 'Running...';
+
+      try {
+        const snap = await getDocs(collection(db, 'hosts'));
+        const batch = writeBatch(db);
+        let count = 0;
+
+        snap.docs.forEach(d => {
+          const data = d.data();
+          if (!data.kycStatus) {
+            batch.update(d.ref, {
+              kycStatus: 'pending',
+              kycMigratedAt: new Date().toISOString()
+            });
+            count++;
+          }
+        });
+
+        if (count === 0) {
+          btn.textContent = 'All hosts already have KYC status';
+          btn.style.background = '#94a3b8';
+          return;
+        }
+
+        await batch.commit();
+        btn.textContent = `Done — ${count} host${count > 1 ? 's' : ''} set to pending`;
+        btn.style.background = '#1a8c6b';
+
+        // Hide the migration section after 4 seconds since it's a one-time action
+        setTimeout(() => {
+          document.getElementById('migrationSection').style.display = 'none';
+        }, 4000);
+      } catch (e) {
+        console.error('Migration error:', e);
+        btn.textContent = 'Migration failed — check console';
+        btn.style.background = '#ef4444';
+        btn.disabled = false;
+      }
+    };
+
+    // Close modal on overlay click
     document.getElementById('editModalOverlay').addEventListener('click', (e) => {
       if (e.target.id === 'editModalOverlay') closeEditModal();
     });

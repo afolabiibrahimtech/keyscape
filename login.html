@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="logo/favicon.jpg">
   <title>Log In | Keyscape Homes</title>
   <link rel="stylesheet" href="styles.css">
   <style>
@@ -106,7 +107,7 @@
 
     const firebaseConfig = {
       apiKey: "AIzaSyD34KXZcVyxnqN_wuP5GShI8uNbe6osXVQ",
-      authDomain: "keyscape-homes.firebaseapp.com",
+      authDomain: "keyscapeltd.org",
       databaseURL: "https://keyscape-homes-default-rtdb.firebaseio.com",
       projectId: "keyscape-homes",
       storageBucket: "keyscape-homes.firebasestorage.app",
@@ -141,7 +142,7 @@
         const result = await signInWithEmailAndPassword(auth, email, password);
         const snap = await getDoc(doc(db, 'hosts', result.user.uid));
         if (snap.exists() && snap.data().profileComplete) {
-          window.location.href = 'list.html';
+          window.location.href = 'index.html';
         } else {
           window.location.href = 'profile.html?setup=true';
         }
@@ -195,7 +196,7 @@
         if (isNewHost) {
           window.location.href = 'profile.html?setup=true';
         } else if (snap.data().profileComplete) {
-          window.location.href = 'list.html';
+          window.location.href = 'index.html';
         } else {
           window.location.href = 'profile.html?setup=true';
         }

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="logo/favicon.jpg">
   <title>List Your Property | Keyscape Homes</title>
   <link rel="stylesheet" href="styles.css">
   <style>
@@ -151,20 +152,6 @@
         <img src="logo/keyscape-logo.png" alt="KeyScape Logo" height="42">
       </a>
 
-      <div class="nav-links">
-        <a href="index.html#listings" class="nav-link">Browse Homes</a>
-        <a href="list.html" class="nav-link" style="color:var(--primary); font-weight:700;">List Your Property</a>
-        <a href="index.html#how" class="nav-link">How it Works</a>
-      </div>
-
-      <div class="nav-auth">
-        <span id="navUser" style="color:#666; font-size:0.9rem; margin-right:4px;"></span>
-        <a href="my-listings.html" id="myListingsLink" style="display:none;" class="nav-link">My Listings</a>
-        <a href="bookings.html" id="bookingsLink" style="display:none;" class="nav-link">Bookings</a>
-        <a href="profile.html" id="profileLink" style="display:none;" class="nav-link">My Profile</a>
-        <a href="#" id="logoutBtn" style="display:none; color:#ef4444;" class="nav-link">Logout</a>
-      </div>
-
       <button class="hamburger" id="hamburgerBtn">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <line x1="3" y1="6" x2="21" y2="6"/>
@@ -172,16 +159,18 @@
           <line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
       </button>
-    </div>
 
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="index.html#listings" class="nav-link">Browse Homes</a>
-      <a href="list.html" class="nav-link">List Your Property</a>
-      <a href="index.html#how" class="nav-link">How it Works</a>
-      <a href="my-listings.html" id="mobileMyListingsLink" style="display:none;" class="nav-link">My Listings</a>
-      <a href="bookings.html" id="mobileBookingsLink" style="display:none;" class="nav-link">Bookings</a>
-      <a href="profile.html" id="mobileProfileLink" style="display:none;" class="nav-link">My Profile</a>
-      <a href="#" id="mobileLogoutBtn" style="display:none; color:#ef4444;" class="nav-link">Logout</a>
+      <div class="mobile-menu" id="mobileMenu">
+        <span id="navUser" style="display:none;" class="menu-user"></span>
+        <a href="index.html#listings" class="nav-link">Browse Homes</a>
+        <a href="list.html" class="nav-link" style="color:var(--primary); font-weight:700;">List Your Property</a>
+        <a href="index.html#how" class="nav-link">How it Works</a>
+        <hr class="menu-divider">
+        <a href="my-listings.html" id="myListingsLink" style="display:none;" class="nav-link">My Listings</a>
+        <a href="bookings.html" id="bookingsLink" style="display:none;" class="nav-link">Bookings</a>
+        <a href="profile.html" id="profileLink" style="display:none;" class="nav-link">My Profile</a>
+        <a href="#" id="logoutBtn" style="display:none; color:#ef4444;" class="nav-link">Logout</a>
+      </div>
     </div>
   </nav>
 
@@ -461,16 +450,17 @@
         return;
       }
       hostProfile = snap.data();
+      if (hostProfile.kycStatus !== 'verified') {
+        window.location.href = 'kyc.html';
+        return;
+      }
       document.getElementById('listingForm').style.display = 'block';
+      document.getElementById('navUser').style.display = 'block';
       document.getElementById('navUser').textContent = hostProfile.name;
-      document.getElementById('myListingsLink').style.display = 'inline';
-      document.getElementById('mobileMyListingsLink').style.display = 'block';
-      document.getElementById('bookingsLink').style.display = 'inline';
-      document.getElementById('mobileBookingsLink').style.display = 'block';
-      document.getElementById('profileLink').style.display = 'inline';
-      document.getElementById('mobileProfileLink').style.display = 'block';
-      document.getElementById('logoutBtn').style.display = 'inline';
-      document.getElementById('mobileLogoutBtn').style.display = 'block';
+      document.getElementById('myListingsLink').style.display = 'block';
+      document.getElementById('bookingsLink').style.display = 'block';
+      document.getElementById('profileLink').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'block';
       document.getElementById('hostPreviewName').textContent = hostProfile.name;
       document.getElementById('hostPreviewBio').textContent = hostProfile.bio?.substring(0, 60) + (hostProfile.bio?.length > 60 ? '...' : '');
       document.getElementById('hostPreviewImg').src = hostProfile.photo || avatarPlaceholder(hostProfile.name, 50);
@@ -532,12 +522,6 @@
     };
 
     document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-      e.preventDefault();
-      await signOut(auth);
-      window.location.href = 'index.html';
-    });
-
-    document.getElementById('mobileLogoutBtn').addEventListener('click', async (e) => {
       e.preventDefault();
       await signOut(auth);
       window.location.href = 'index.html';

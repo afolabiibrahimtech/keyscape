@@ -3,27 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="logo/favicon.jpg">
   <title>Bookings | Keyscape Homes</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root { --primary: #0f4c3a; --accent: #1a8c6b; --light: #f8fafc; --dark: #111827; }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: var(--dark); line-height: 1.6; }
 
-    nav { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-    .nav-container { max-width: 1400px; margin: 0 auto; padding: 1.1rem 5%; display: flex; justify-content: space-between; align-items: center; }
+    nav { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+    .nav-container { max-width: 1400px; margin: 0 auto; padding: 1.1rem 5%; display: flex; justify-content: space-between; align-items: center; position: relative; }
     .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.6rem; color: var(--primary); text-decoration: none; }
     .logo:hover img { transform: scale(1.08); }
     .logo img { transition: transform 0.3s; }
-    .nav-links { display: flex; gap: 2.8rem; align-items: center; }
-    .nav-link { text-decoration: none; color: var(--dark); font-weight: 500; position: relative; transition: color 0.3s; }
+    .nav-link { text-decoration: none; color: var(--dark); font-weight: 500; }
     .nav-link:hover { color: var(--primary); }
-    .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 0; background: var(--primary); transition: width 0.3s ease; }
-    .nav-link:hover::after { width: 100%; }
-    .nav-auth { display: flex; align-items: center; gap: 1.2rem; }
-    .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
-    .mobile-menu { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 1.5rem 5%; flex-direction: column; gap: 1.4rem; z-index: 999; }
+    .hamburger { display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; padding: 8px; color: var(--primary); }
+    .mobile-menu { display: none; position: absolute; top: 100%; right: 0; width: 50%; min-width: 240px; max-width: 340px; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.15); padding: 1.2rem 1.5rem; flex-direction: column; gap: 1.1rem; z-index: 999; border-radius: 0 0 0 14px; }
     .mobile-menu.active { display: flex; }
-    @media (max-width: 768px) { .nav-links, .nav-auth { display: none; } .hamburger { display: block; } }
+    .mobile-menu .nav-link { font-size: 0.98rem; padding: 4px 0; display: block; }
+    .menu-divider { border: none; border-top: 1px solid #e2e8f0; margin: 2px 0; }
+    .menu-user { color: #666; font-size: 0.85rem; font-weight: 600; padding-bottom: 2px; display: block; }
+    @media (max-width: 480px) { .mobile-menu { width: 70%; min-width: 0; } }
 
     .page { max-width: 1000px; margin: 0 auto; padding: 2rem 5%; }
     .page-header { margin-bottom: 1.5rem; }
@@ -53,17 +53,20 @@
     .badge.pending { background: #fef3c7; color: #92400e; }
     .badge.confirmed { background: #d1fae5; color: #065f46; }
     .badge.completed { background: #e0e7ff; color: #3730a3; }
+    .badge.cancelled { background: #fee2e2; color: #991b1b; }
 
     .action-btns { display: flex; flex-direction: column; gap: 8px; min-width: 120px; }
-    .confirm-btn, .checkout-link-btn {
+    .confirm-btn, .checkout-link-btn, .cancel-btn, .details-btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
       padding: 8px 14px; border-radius: 8px; border: none; font-weight: 600;
       cursor: pointer; font-size: 0.82rem; transition: all 0.2s; text-decoration: none;
     }
     .confirm-btn { background: #d1fae5; color: #065f46; }
     .confirm-btn:hover { background: #6ee7b7; }
-    .checkout-link-btn { background: #f0fdf4; color: var(--primary); border: 2px solid var(--primary); }
-    .checkout-link-btn:hover { background: var(--primary); color: white; }
+    .checkout-link-btn, .details-btn { background: #f0fdf4; color: var(--primary); border: 2px solid var(--primary); }
+    .checkout-link-btn:hover, .details-btn:hover { background: var(--primary); color: white; }
+    .cancel-btn { background: #fee2e2; color: #991b1b; }
+    .cancel-btn:hover { background: #fca5a5; }
 
     .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
     .empty-state svg { margin-bottom: 1rem; color: #cbd5e1; }
@@ -73,6 +76,39 @@
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
     footer { text-align: center; padding: 2rem 5%; background: var(--dark); color: white; margin-top: 2rem; }
+
+    /* Admin Booking Details Modal */
+    .detail-modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      align-items: center; justify-content: center; z-index: 2000; padding: 16px;
+    }
+    .detail-modal-overlay.active { display: flex; }
+    .detail-modal {
+      background: white; border-radius: 16px; width: 100%; max-width: 480px;
+      max-height: 90vh; overflow-y: auto; padding: 1.8rem;
+    }
+    .detail-modal h2 { color: var(--primary); margin-bottom: 0.3rem; font-size: 1.25rem; }
+    .detail-modal .modal-subtitle { color: #94a3b8; font-size: 0.85rem; margin-bottom: 1.2rem; }
+    .detail-row {
+      display: flex; justify-content: space-between; padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9; font-size: 0.92rem; gap: 12px;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row span:first-child { color: #666; flex-shrink: 0; }
+    .detail-row span:last-child { font-weight: 600; text-align: right; }
+    .detail-modal-close {
+      width: 100%; margin-top: 1.4rem; padding: 12px; border-radius: 10px;
+      border: none; background: #f1f5f9; color: #64748b; font-weight: 600;
+      cursor: pointer; font-size: 0.95rem;
+    }
+    .detail-modal-close:hover { background: #e2e8f0; }
+    .whatsapp-guest-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; margin-top: 0.8rem; padding: 12px; border-radius: 10px;
+      border: none; background: #25D366; color: white; font-weight: 600;
+      cursor: pointer; font-size: 0.95rem; text-decoration: none;
+    }
+    .whatsapp-guest-btn:hover { background: #1ea952; }
 
     @media (max-width: 600px) {
       .booking-card { grid-template-columns: 1fr; }
@@ -87,30 +123,21 @@
       <a href="index.html" class="logo">
         <img src="logo/keyscape-logo.png" alt="KeyScape Logo" height="42">
       </a>
-      <div class="nav-links">
-        <a href="index.html#listings" class="nav-link">Browse Homes</a>
-        <a href="list.html" class="nav-link">List Your Property</a>
-        <a href="index.html#how" class="nav-link">How it Works</a>
-      </div>
-      <div class="nav-auth">
-        <span id="navUser" style="color:#666; font-size:0.9rem;"></span>
-        <a href="my-listings.html" class="nav-link">My Listings</a>
-        <a href="profile.html" class="nav-link">My Profile</a>
-        <a href="#" id="logoutBtn" style="color:#ef4444;" class="nav-link">Logout</a>
-      </div>
       <button class="hamburger" id="hamburgerBtn">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
       </button>
-    </div>
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="index.html#listings" class="nav-link">Browse Homes</a>
-      <a href="list.html" class="nav-link">List Your Property</a>
-      <a href="index.html#how" class="nav-link">How it Works</a>
-      <a href="my-listings.html" class="nav-link">My Listings</a>
-      <a href="profile.html" class="nav-link">My Profile</a>
-      <a href="#" id="mobileLogoutBtn" style="color:#ef4444;" class="nav-link">Logout</a>
+      <div class="mobile-menu" id="mobileMenu">
+        <span id="navUser" class="menu-user"></span>
+        <a href="index.html#listings" class="nav-link">Browse Homes</a>
+        <a href="list.html" class="nav-link">List Your Property</a>
+        <a href="index.html#how" class="nav-link">How it Works</a>
+        <hr class="menu-divider">
+        <a href="my-listings.html" class="nav-link">My Listings</a>
+        <a href="profile.html" class="nav-link">My Profile</a>
+        <a href="#" id="logoutBtn" style="color:#ef4444;" class="nav-link">Logout</a>
+      </div>
     </div>
   </nav>
 
@@ -124,12 +151,14 @@
       <div class="stat-card"><div class="num" id="statPending">0</div><div class="label">Pending</div></div>
       <div class="stat-card"><div class="num" id="statConfirmed">0</div><div class="label">Confirmed</div></div>
       <div class="stat-card"><div class="num" id="statCompleted">0</div><div class="label">Completed</div></div>
+      <div class="stat-card"><div class="num" id="statCancelled">0</div><div class="label">Cancelled</div></div>
     </div>
 
     <div class="tab-btns">
       <button class="tab-btn active" onclick="switchTab('pending', this)">Pending</button>
       <button class="tab-btn" onclick="switchTab('confirmed', this)">Confirmed</button>
       <button class="tab-btn" onclick="switchTab('completed', this)">Completed</button>
+      <button class="tab-btn" onclick="switchTab('cancelled', this)">Cancelled</button>
     </div>
 
     <div class="loading-state" id="loadingState">
@@ -140,12 +169,38 @@
     <div id="bookingsContainer"></div>
   </div>
 
+  <!-- Admin Booking Details Modal -->
+  <div class="detail-modal-overlay" id="detailModalOverlay">
+    <div class="detail-modal">
+      <h2 id="detailPropertyName"></h2>
+      <p class="modal-subtitle">Booking reference: <span id="detailBookingId"></span></p>
+
+      <div class="detail-row"><span>Status</span><span id="detailStatus"></span></div>
+      <div class="detail-row"><span>Guest Name</span><span id="detailGuestName"></span></div>
+      <div class="detail-row"><span>Guest Phone</span><span id="detailGuestPhone"></span></div>
+      <div class="detail-row"><span>Check-in</span><span id="detailCheckIn"></span></div>
+      <div class="detail-row"><span>Check-out</span><span id="detailCheckOut"></span></div>
+      <div class="detail-row"><span>Nights</span><span id="detailNights"></span></div>
+      <div class="detail-row"><span>Total Price</span><span id="detailTotal"></span></div>
+      <div class="detail-row"><span>Booked On</span><span id="detailCreatedAt"></span></div>
+      <div class="detail-row" id="detailExtendedRow" style="display:none;"><span>Extended From</span><span id="detailExtendedFrom"></span></div>
+      <div class="detail-row" id="detailCheckedOutRow" style="display:none;"><span>Checked Out</span><span id="detailCheckedOutAt"></span></div>
+
+      <a id="whatsappGuestLink" href="#" target="_blank" class="whatsapp-guest-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.555 4.117 1.523 5.847L0 24l6.305-1.654A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.94 9.94 0 01-5.066-1.387l-.363-.215-3.74.982.998-3.647-.236-.374A9.95 9.95 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/><path d="M17.292 14.245c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.198.297-.767.966-.94 1.164-.173.198-.347.223-.644.075-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.058-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.297-.496.099-.198.05-.372-.025-.521-.074-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.273.297-1.04 1.016-1.04 2.479 0 1.462 1.064 2.875 1.213 3.073.149.198 2.095 3.2 5.076 4.487.709.306 1.262.489 1.693.625.711.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+        Message Guest on WhatsApp
+      </a>
+
+      <button class="detail-modal-close" onclick="closeDetailModal()">Close</button>
+    </div>
+  </div>
+
   <footer><p>© 2026 Keyscape Homes. All rights reserved.</p></footer>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD34KXZcVyxnqN_wuP5GShI8uNbe6osXVQ",
@@ -165,6 +220,7 @@
     const iconClock = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
     const iconCheck = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
     const iconFlag = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>`;
+    const iconX = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
     const iconLink = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07l1.49-1.49"/></svg>`;
     const iconInbox = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>`;
 
@@ -185,21 +241,22 @@
       document.getElementById('logoutBtn').addEventListener('click', async (e) => {
         e.preventDefault(); await signOut(auth); window.location.href = 'index.html';
       });
-      document.getElementById('mobileLogoutBtn').addEventListener('click', async (e) => {
-        e.preventDefault(); await signOut(auth); window.location.href = 'index.html';
-      });
 
       await loadBookings(user.uid);
     });
 
     async function loadBookings(uid) {
       try {
+        console.log('Querying bookings for hostUid:', uid);
         const q = query(collection(db, 'bookings'), where('hostUid', '==', uid));
         const snap = await getDocs(q);
+        console.log('Bookings found:', snap.size);
+        snap.docs.forEach(d => console.log(d.id, d.data()));
         allBookings = snap.docs.map(d => ({ firestoreId: d.id, ...d.data() }));
         document.getElementById('loadingState').style.display = 'none';
         renderDashboard();
       } catch (e) {
+        console.error('loadBookings error:', e);
         document.getElementById('loadingState').innerHTML = '<p>Failed to load bookings. Please refresh.</p>';
       }
     }
@@ -208,6 +265,7 @@
       document.getElementById('statPending').textContent = allBookings.filter(b => b.status === 'pending').length;
       document.getElementById('statConfirmed').textContent = allBookings.filter(b => b.status === 'confirmed').length;
       document.getElementById('statCompleted').textContent = allBookings.filter(b => b.status === 'completed').length;
+      document.getElementById('statCancelled').textContent = allBookings.filter(b => b.status === 'cancelled').length;
       renderTab(currentTab);
     }
 
@@ -228,32 +286,122 @@
         return;
       }
 
-      const badgeIcon = { pending: iconClock, confirmed: iconCheck, completed: iconFlag };
+      const badgeIcon = { pending: iconClock, confirmed: iconCheck, completed: iconFlag, cancelled: iconX };
 
       container.innerHTML = data.map(b => `
         <div class="booking-card">
           <img src="${b.propertyImage}" alt="${b.propertyName}" onerror="this.style.background='#e2e8f0'">
           <div class="booking-info">
             <span class="badge ${b.status}">${badgeIcon[b.status]} ${b.status.charAt(0).toUpperCase()+b.status.slice(1)}</span>
+            ${b.extendedFrom ? `<span class="badge" style="background:#ede9fe; color:#5b21b6; margin-left:6px;">${iconFlag} Extended Stay</span>` : ''}
             <h3>${b.propertyName}</h3>
             <p>${b.guestName} · ${b.guestPhone}</p>
             <p>${new Date(b.checkInDate).toLocaleDateString('en-GB')} → ${new Date(b.checkOutDate).toLocaleDateString('en-GB')} (${b.nights} night${b.nights > 1 ? 's' : ''})</p>
             <p class="price">₦${b.totalPrice}</p>
+            ${b.status === 'completed' && b.checkedOutAt ? `<p style="color:#3730a3; font-size:0.82rem; font-weight:600; margin-top:4px;">${iconFlag} Guest checked out ${new Date(b.checkedOutAt).toLocaleDateString('en-GB')}</p>` : ''}
           </div>
           <div class="action-btns">
             ${b.status === 'pending' ? `<button class="confirm-btn" onclick="updateBookingStatus('${b.firestoreId}', 'confirmed')">${iconCheck} Confirm</button>` : ''}
-            <a href="checkout.html?id=${b.firestoreId}" target="_blank" class="checkout-link-btn">${iconLink} View Booking</a>
+            ${(b.status === 'pending' || b.status === 'confirmed') ? `<button class="cancel-btn" onclick="updateBookingStatus('${b.firestoreId}', 'cancelled')">${iconX} Cancel</button>` : ''}
+            <button class="details-btn" onclick="openDetailModal('${b.firestoreId}')">${iconLink} View Details</button>
           </div>
         </div>
       `).join('');
     }
 
+    // Returns array of YYYY-MM-DD strings for every night of the stay (check-in inclusive, check-out exclusive)
+    function getDateRange(checkInStr, checkOutStr) {
+      const dates = [];
+      const cursor = new Date(checkInStr);
+      const end = new Date(checkOutStr);
+      while (cursor < end) {
+        dates.push(`${cursor.getFullYear()}-${String(cursor.getMonth()+1).padStart(2,'0')}-${String(cursor.getDate()).padStart(2,'0')}`);
+        cursor.setDate(cursor.getDate() + 1);
+      }
+      return dates;
+    }
+
     window.updateBookingStatus = async function(firestoreId, status) {
-      await updateDoc(doc(db, 'bookings', firestoreId), { status });
-      const item = allBookings.find(b => b.firestoreId === firestoreId);
-      if (item) item.status = status;
-      renderDashboard();
+      const booking = allBookings.find(b => b.firestoreId === firestoreId);
+      if (!booking) return;
+
+      if (status === 'cancelled' && !confirm('Cancel this booking? The guest will need to be notified separately.')) return;
+
+      try {
+        await updateDoc(doc(db, 'bookings', firestoreId), { status });
+
+        // Confirming a booking blocks those dates on the property's calendar
+        // Cancelling a previously-confirmed booking frees those dates back up
+        if (booking.propertyId) {
+          const nights = getDateRange(booking.checkInDate, booking.checkOutDate);
+          const listingRef = doc(db, 'listings', booking.propertyId);
+
+          if (status === 'confirmed') {
+            await updateDoc(listingRef, { blockedDates: arrayUnion(...nights) });
+          } else if (status === 'cancelled' && booking.status === 'confirmed') {
+            await updateDoc(listingRef, { blockedDates: arrayRemove(...nights) });
+          }
+        }
+
+        booking.status = status;
+        renderDashboard();
+      } catch (e) {
+        console.error('Failed to update booking status:', e);
+        alert('Something went wrong updating this booking. Please try again.');
+      }
     };
+
+    function normalizePhone(phone) {
+      let digits = (phone || '').replace(/[^\d]/g, '');
+      if (!digits) return '';
+      if (digits.startsWith('0')) digits = '234' + digits.slice(1);
+      else if (!digits.startsWith('234')) digits = '234' + digits;
+      return digits;
+    }
+
+    window.openDetailModal = function(firestoreId) {
+      const b = allBookings.find(x => x.firestoreId === firestoreId);
+      if (!b) return;
+
+      document.getElementById('detailPropertyName').textContent = b.propertyName;
+      document.getElementById('detailBookingId').textContent = firestoreId;
+      document.getElementById('detailStatus').textContent = b.status.charAt(0).toUpperCase() + b.status.slice(1);
+      document.getElementById('detailGuestName').textContent = b.guestName;
+      document.getElementById('detailGuestPhone').textContent = b.guestPhone;
+      document.getElementById('detailCheckIn').textContent = new Date(b.checkInDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      document.getElementById('detailCheckOut').textContent = new Date(b.checkOutDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      document.getElementById('detailNights').textContent = `${b.nights} night${b.nights > 1 ? 's' : ''}`;
+      document.getElementById('detailTotal').textContent = `₦${b.totalPrice}`;
+      document.getElementById('detailCreatedAt').textContent = b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-GB') : 'N/A';
+
+      if (b.extendedFrom) {
+        document.getElementById('detailExtendedRow').style.display = 'flex';
+        document.getElementById('detailExtendedFrom').textContent = b.extendedFrom;
+      } else {
+        document.getElementById('detailExtendedRow').style.display = 'none';
+      }
+
+      if (b.checkedOutAt) {
+        document.getElementById('detailCheckedOutRow').style.display = 'flex';
+        document.getElementById('detailCheckedOutAt').textContent = new Date(b.checkedOutAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      } else {
+        document.getElementById('detailCheckedOutRow').style.display = 'none';
+      }
+
+      const phone = normalizePhone(b.guestPhone);
+      const msg = `Hello ${b.guestName}, this is regarding your booking for ${b.propertyName} (${new Date(b.checkInDate).toLocaleDateString('en-GB')} - ${new Date(b.checkOutDate).toLocaleDateString('en-GB')}).`;
+      document.getElementById('whatsappGuestLink').href = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}` : '#';
+
+      document.getElementById('detailModalOverlay').classList.add('active');
+    };
+
+    window.closeDetailModal = function() {
+      document.getElementById('detailModalOverlay').classList.remove('active');
+    };
+
+    document.getElementById('detailModalOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'detailModalOverlay') closeDetailModal();
+    });
   </script>
 </body>
 </html>

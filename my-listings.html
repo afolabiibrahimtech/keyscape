@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="logo/favicon.jpg">
   <title>My Listings | Keyscape Homes</title>
   <link rel="stylesheet" href="styles.css">
   <style>
@@ -77,16 +78,6 @@
       <a href="index.html" class="logo">
         <img src="logo/keyscape-logo.png" alt="KeyScape Logo" height="42">
       </a>
-      <div class="nav-links">
-        <a href="index.html#listings" class="nav-link">Browse Homes</a>
-        <a href="list.html" class="nav-link">List Your Property</a>
-        <a href="index.html#how" class="nav-link">How it Works</a>
-      </div>
-      <div class="nav-auth">
-        <span id="navUser" style="color:#666; font-size:0.9rem;"></span>
-        <a href="profile.html" class="nav-link">My Profile</a>
-        <a href="#" id="logoutBtn" style="color:#ef4444;" class="nav-link">Logout</a>
-      </div>
       <button class="hamburger" id="hamburgerBtn">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <line x1="3" y1="6" x2="21" y2="6"/>
@@ -94,13 +85,16 @@
           <line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
       </button>
-    </div>
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="index.html#listings" class="nav-link">Browse Homes</a>
-      <a href="list.html" class="nav-link">List Your Property</a>
-      <a href="index.html#how" class="nav-link">How it Works</a>
-      <a href="profile.html" class="nav-link">My Profile</a>
-      <a href="#" id="mobileLogoutBtn" style="color:#ef4444;" class="nav-link">Logout</a>
+      <div class="mobile-menu" id="mobileMenu">
+        <span id="navUser" class="menu-user"></span>
+        <a href="index.html#listings" class="nav-link">Browse Homes</a>
+        <a href="list.html" class="nav-link">List Your Property</a>
+        <a href="index.html#how" class="nav-link">How it Works</a>
+        <hr class="menu-divider">
+        <a href="profile.html" class="nav-link">My Profile</a>
+        <a href="bookings.html" class="nav-link">Bookings</a>
+        <a href="#" id="logoutBtn" style="color:#ef4444;" class="nav-link">Logout</a>
+      </div>
     </div>
   </nav>
 
@@ -176,12 +170,6 @@
     });
 
     document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-      e.preventDefault();
-      await signOut(auth);
-      window.location.href = 'index.html';
-    });
-
-    document.getElementById('mobileLogoutBtn').addEventListener('click', async (e) => {
       e.preventDefault();
       await signOut(auth);
       window.location.href = 'index.html';
